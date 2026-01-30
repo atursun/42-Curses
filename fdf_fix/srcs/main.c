@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/28 13:21:14 by atursun          ###   ########.fr       */
+/*   Updated: 2026/01/30 17:47:27 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,5 +110,14 @@ int	main(int argc, char **argv)
 
 /*
 her şey bitti proje sorunsuz bir şekilde çalışıyor tek yapman gereken tekrar ve README.md hazırlaman
+evo sırasında mars.fdf çalışmayabilir o yüzden sen son satırdaki son columunu silmen gerekiyor çünkü eşit değilmişş
+*/
+
+/*
+Proje akış şeması
+
+1. Map parsing: .map dosyası -> satır satır oku -> sütun sayısını kontrol et -> 3D noktaları oluştur (x, y, z, color) -> haritayı merkeze al
+
+
 
 */

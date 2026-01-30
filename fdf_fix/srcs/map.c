@@ -6,28 +6,33 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 12:59:28 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/28 13:20:05 by atursun          ###   ########.fr       */
+/*   Updated: 2026/01/30 18:18:55 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+#include <stdio.h>
 
+// mapte her satır aynı sayıda nokta içermeli
 int	calculate_number_of_column(t_fdf *fdf)
 {
 	int		c_col;
 	int		next_col;
 	int		i;
+	char 	*trimmed;
 
 	if (fdf->map_line.count_line == 0)
 		return (0);
-	c_col = ft_len_of_word(fdf->map_line.line[0], ' ');
+	c_col = ft_len_of_word(fdf->map_line.line[0], ' ');		// İlk satır referans alınır
 	i = 1;
 	while (i < fdf->map_line.count_line)
 	{
-		next_col = ft_len_of_word(fdf->map_line.line[i], ' ');
-		if (c_col != next_col)
+		trimmed = ft_strtrim(fdf->map_line.line[i], " \n");
+		next_col = ft_len_of_word(trimmed, ' ');
+		if (c_col != next_col)	// Uyuşmazsa → harita bozuk
 			return (0);
 		i++;
+		free(trimmed);
 	}
 	return (c_col);
 }
@@ -63,12 +68,13 @@ void	get_points(t_fdf *fdf)
 	while (y < fdf->map_line.count_line)
 	{
 		split = ft_split(fdf->map_line.line[y], ' ');
+		if (!split) 
+			return ;
 		x = 0;	// sütün sayısı (width)
-		while (x < fdf->map->maxX)
+		while (split[x])
 		{
-			if (!split) 
-				return ;
-			place_the_point(split[x], fdf->map, x, y);
+			if (x < fdf->map->maxX)
+				place_the_point(split[x], fdf->map, x, y);
 			free(split[x]);
 			x++;
 		}
@@ -77,9 +83,15 @@ void	get_points(t_fdf *fdf)
 	}
 }
 
+/*
+bu fonksiyon açıklan dosyanın fd sini alıyor ve get_next_line ile dosyayı satır satır okuyor
+okudğu her satırı ise struct'e ekliyor
+bunu yapmamın nedeni başka fonksiyonlarda tekrar tekrar açmamak
+
+*/
 int read_map(int fd, t_fdf *fdf) {
 	fdf->map_line.count_line = 0;
-	fdf->map_line.line = malloc(sizeof(char *) * 10000);
+	fdf->map_line.line = malloc(sizeof(char *) * 10000);	// maximum 10000 satır gibi düşün
 	if (!fdf->map_line.line)
 		return (0);
 	while (fdf->map_line.count_line < 10000) {
@@ -93,6 +105,11 @@ int read_map(int fd, t_fdf *fdf) {
 	return (fdf->map_line.count_line);
 }
 
+
+/*
+Bu fonksiyon;
+Verilen map dosyasını açıyor, satırları tek tek okuyor, sütun/satır sayısını buluyor, noktaları oluşturuyor ve haritayı merkeze alıyor
+*/
 t_map	*parse_map(char *file, t_fdf *fdf)
 {
 	int		fd;

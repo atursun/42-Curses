@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:30 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/28 12:31:29 by atursun          ###   ########.fr       */
+/*   Updated: 2026/01/30 17:37:05 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,20 +75,20 @@ void	isometric(t_line *line)
 t_point	**allocate_coordinates(int width, int depth)
 {
 	int		i;
-	t_point	**coordin;
+	t_point	**coordinates;
 
-	coordin = malloc(width * sizeof(t_point *));
-	if (!coordin)
+	coordinates = malloc(width * sizeof(t_point *));
+	if (!coordinates)
 		return (NULL);
 	i = 0;
 	while (i < width)
 	{
-		coordin[i] = malloc(depth * sizeof(t_point));
-		if (!coordin[i])
+		coordinates[i] = malloc(depth * sizeof(t_point));
+		if (!coordinates[i])
 			return (NULL);
 		i++;
 	}
-	return (coordin);
+	return (coordinates);
 }
 
 void	center_map_to_origin(t_map *map, int max_y, int max_x)
