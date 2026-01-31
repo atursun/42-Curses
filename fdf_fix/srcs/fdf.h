@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:01:38 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/28 12:33:03 by atursun          ###   ########.fr       */
+/*   Updated: 2026/01/31 13:16:41 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ typedef struct s_fdf
 	t_cam		*cam;
 	t_map		*map;
 	t_map_lines map_line;
-}	t_fdf;
+}	t_fdf;			// ana struct'ım bu içinde map, cam, image vb.. yapılarım var
 
 # define WIDTH			2000
 # define HEIGHT			1500
@@ -91,7 +91,6 @@ t_map	*parse_map(char *file, t_fdf *fdf);
 int		is_file_extension_valid(char *filename);
 void	init_mlx_image_cam(t_fdf *fdf);
 t_point	**allocate_coordinates(int width, int depth);
-void	center_map_to_origin(t_map *map, int max_y, int max_x);
 int		free_all(t_fdf *fdf);
 void	free_map(t_fdf *fdf);
 void	render_image(t_fdf *fdf);
