@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:30 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/31 13:34:39 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/01 17:53:12 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,12 +103,12 @@ void	isometric(t_line *line)
 	t_point	new_start;
 	t_point	new_end;
 
-	new_start.x = (line->start.x - line->start.y) * cos(ANG_30);
-	new_start.y = (line->start.x + line->start.y) * sin(ANG_30) - line->start.z;
+	new_start.x = (line->start.x - line->start.y) * cos(THIRTY_DEGREE_ANG);
+	new_start.y = (line->start.x + line->start.y) * sin(THIRTY_DEGREE_ANG) - line->start.z;
 	line->start.x = new_start.x;
 	line->start.y = new_start.y;
-	new_end.x = (line->end.x - line->end.y) * cos(ANG_30);
-	new_end.y = (line->end.x + line->end.y) * sin(ANG_30) - line->end.z;
+	new_end.x = (line->end.x - line->end.y) * cos(THIRTY_DEGREE_ANG);
+	new_end.y = (line->end.x + line->end.y) * sin(THIRTY_DEGREE_ANG) - line->end.z;
 	line->end.x = new_end.x;
 	line->end.y = new_end.y;
 }

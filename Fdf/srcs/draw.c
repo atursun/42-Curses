@@ -6,12 +6,41 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:56 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/28 13:19:55 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/01 18:01:37 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+/* pixel_to_image (Hafızaya Yazmak)
+Bu fonksiyon, ekrana ("pencereye") anlık olarak çizim yapmaz. 
+Bunun yerine, bilgisayarın RAM'inde duran bir resim verisine (buffer) doğrudan müdahale eder. 
+Bu yöntem mlx_pixel_put() fonksiyonundan binlerce kat daha hızlıdır. neden onun kullanılmadınığına bak
+*/
+void	pixel_to_image(t_image *image, float x, float y, int color)
+{
+	int	pixel;
+
+	pixel = ((int)y * image->line_bytes) + ((int)x * 4);	// Bellekteki adresi hesaplar.
+	if (image->endian == 1)
+	{
+		image->buffer[pixel + 0] = (color >> 24);
+		image->buffer[pixel + 1] = (color >> 16);
+		image->buffer[pixel + 2] = (color >> 8);
+		image->buffer[pixel + 3] = (color);
+	}
+	else if (image->endian == 0)
+	{
+		image->buffer[pixel + 0] = (color);
+		image->buffer[pixel + 1] = (color >> 8);
+		image->buffer[pixel + 2] = (color >> 16);
+		image->buffer[pixel + 3] = (color >> 24);
+	}
+}
+
+/*
+
+*/
 void	bresenham(t_fdf *fdf, t_point start, t_point end)
 {
 	float	dx;
@@ -32,27 +61,6 @@ void	bresenham(t_fdf *fdf, t_point start, t_point end)
 		start.x += dx;
 		start.y += dy;
 		i++;
-	}
-}
-
-void	pixel_to_image(t_image *image, float x, float y, int color)
-{
-	int	pixel;
-
-	pixel = ((int)y * image->line_bytes) + ((int)x * 4);	// Bellekteki adresi hesaplar.
-	if (image->endian == 1)
-	{
-		image->buffer[pixel + 0] = (color >> 24);
-		image->buffer[pixel + 1] = (color >> 16);
-		image->buffer[pixel + 2] = (color >> 8);
-		image->buffer[pixel + 3] = (color);
-	}
-	else if (image->endian == 0)
-	{
-		image->buffer[pixel + 0] = (color);
-		image->buffer[pixel + 1] = (color >> 8);
-		image->buffer[pixel + 2] = (color >> 16);
-		image->buffer[pixel + 3] = (color >> 24);
 	}
 }
 

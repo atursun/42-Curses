@@ -6,7 +6,7 @@ Eğer dosyadaki sayıların hepsi birbirinin aynısı olsaydı (örneğin hepsi 
 
 Bu belge, `.fdf` dosya formatının yapısını, koordinat sistemlerini ve projenin matematiksel temelini açıklar.
 
----
+<!-- --ben seni daha çok seviyorum :) -->
 
 ## 1. Girdi Dosyası (.fdf) Yapısı
 

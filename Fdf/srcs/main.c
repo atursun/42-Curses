@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/01 13:15:58 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/01 17:58:09 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,32 @@ int	handle_esc(int keycode, t_fdf *fdf)
 	return (0);
 }
 
+/*
+
+
+
+# renklendirme (if (!start.has_color && !end.has_color))
+Haritadan okunan noktada renk bilgisi (örneğin ,0xFF0000) yoksa, çizginin siyah (görünmez) olmasını 
+engellemek için varsayılan olarak BEYAZ renk atanır.
+
+# isometric(&line) 
+(x,y,z) olan 3 boyutlu koordinat sistemi, matematiksel formüllerle (sinüs, kosinüs) 
+(x,y) olan 2 boyutlu ekran düzlemine yatırılır.
+
+# scale
+Haritadaki noktalar arası mesafe varsayılan olarak 1 birimdir (örneğin x=1, x=2).
+Bu ekranda sadece 1 piksel demektir ve çok küçük kalır.
+scale_factor (örneğin 20) ile çarparak noktaların arasını açarız. Böylece şekil ekranda büyür (Zoom in).
+
+# translate
+Bilgisayar grafiklerinde (0,0) noktası ekranın sol üst köşesidir. Eğer öteleme yapmazsak 
+harita sol üst köşeye sıkışmış olarak çizilir ve bir kısmı ekran dışında kalabilir.
+move_x ve move_y değerlerini ekleyerek şekli ekranın ortasına (veya tuşlarla istediğimiz yere) kaydırırız.
+
+# bresenham
+Artık elimizde ekran koordinatlarına tam olarak oturmuş, büyütülmüş ve renklendirilmiş iki nokta var.
+bresenham algoritması bu iki nokta arasındaki pikselleri tek tek hesaplayıp hafızadaki resme (image buffer) yazar.
+*/
 void	render_line(t_fdf *fdf, t_point start, t_point end)
 {
 	t_line line;
@@ -27,43 +53,51 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	line.end = end;
 	if (!start.has_color && !end.has_color)
 	{
-		line.start.color = WHITE;
-		line.end.color = WHITE;
+		line.start.color = 0XFFFFFF;	// white
+		line.end.color = 0XFFFFFF;
 	}
-	isometric(&line);
+	
+	isometric(&line); // 3D -> 2D
 
-	// scale
+	// scale/ölçekleme
 	line.start.x *= fdf->cam->scale_factor;
 	line.start.y *= fdf->cam->scale_factor;
 	line.end.x *= fdf->cam->scale_factor;
 	line.end.y *= fdf->cam->scale_factor;
 
-	// translate
+	// translate/öteleme/move
 	line.start.x += fdf->cam->move_x;
 	line.start.y += fdf->cam->move_y;
 	line.end.x += fdf->cam->move_x;
 	line.end.y += fdf->cam->move_y;
 
+	// Pikselleştirme (Rasterization)
 	bresenham(fdf, line.start, line.end);
 }
 
-void	render_image(t_fdf *fdf)
+/*
+Bu fonksiyon, haritadaki tüm noktaları tek tek gezer ve onları birbirine 
+bağlayarak (wireframe) görüntüsünü oluşturur.
+Yani, Haritadaki her bir noktayı ziyaret eder ve bu noktanın 
+komşularıyla (sağındaki ve altındaki) arasındaki çizgileri çizer.
+Bu iç içe döngü yapısı, (0,0) noktasından başlayıp (maxX, maxY) noktasına kadar 
+haritadaki her bir noktayı tek tek ele almamızı sağlar.
+*/
+void	render_image(t_fdf *fdf, t_map *map)
 {
 	int	x;
 	int	y;
 
 	y = 0;
-	while (y < fdf->map->maxY)
+	while (y < map->maxY)	// height (Satırları gezer (Yukarıdan aşağıya))
 	{
 		x = 0;
-		while (x < fdf->map->maxX)
+		while (x < map->maxX)	// width (Sütunları gezer (Soldan sağa))
 		{
-			if (x < fdf->map->maxX - 1)
-				render_line(fdf, fdf->map->coord[x][y], \
-					fdf->map->coord[x + 1][y]);
-			if (y < fdf->map->maxY - 1)
-				render_line(fdf, fdf->map->coord[x][y], \
-					fdf->map->coord[x][y + 1]);
+			if (x < map->maxX - 1) // bunu yapmamızın sebebi son sütüna geldiğinde ve x + 1 yaptığımızda hata alırız çünkü son saıtr bir sonraki sütün yok ki
+				render_line(fdf, map->coord[x][y], map->coord[x + 1][y]);
+			if (y < map->maxY - 1)
+				render_line(fdf, map->coord[x][y], map->coord[x][y + 1]);
 			x++;
 		}
 		y++;
@@ -99,7 +133,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	init_mlx_image_cam(fdf);
-	render_image(fdf);
+	render_image(fdf, fdf->map);
 	mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->image->image, 0, 0);
 	mlx_string_put(fdf->mlx, fdf->win, 50, 100, 0XC70839, "PRESS 'ESC' TO CLOSE");
 	mlx_key_hook(fdf->win, handle_esc, fdf);
@@ -129,7 +163,8 @@ GENEL
 - graphic programming
 
 KOD MANTIĞI
-- 
-
+- bütün kodu anla
+- neden bresenham gibi
+- her şeyi detayılca
 
 */

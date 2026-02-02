@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 12:59:28 by atursun           #+#    #+#             */
-/*   Updated: 2026/01/31 15:12:06 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/01 17:36:21 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 // mapte her satır aynı sayıda nokta içermeli
 int	calculate_number_of_column(t_fdf *fdf)
 {
+	int		i;
 	int		c_col;
 	int		next_col;
-	int		i;
 	char 	*trimmed;
 	char 	*trimmed_two;
 
@@ -76,7 +76,7 @@ void	place_the_point(char *point, t_map *map, int x, int y)
 	{
 		vertex = ft_split(point, ',');
 		map->coord[x][y].z = ft_atoi(vertex[0]);
-		map->coord[x][y].color = ft_atoi_base(vertex[1], HEXADECM);
+		map->coord[x][y].color = ft_atoi_base(vertex[1], "0123456789abcdef");
 		map->coord[x][y].has_color = 1;
 		ft_free(vertex);
 	}
@@ -114,6 +114,9 @@ void	get_points(t_fdf *fdf)
 		y++;
 	}
 }
+
+
+
 
 /*
 bu fonksiyon açıklan dosyanın fd sini alıyor ve get_next_line ile dosyayı satır satır okuyor
@@ -167,7 +170,9 @@ t_map	*parse_map(char *file, t_fdf *fdf)
 	if (!fdf->map->coord) {
 		return (NULL);
 	}
+	// get_points(fdf);
 	get_points(fdf);
 	ft_free(fdf->map_line.line);
 	return (fdf->map);
 }
+
