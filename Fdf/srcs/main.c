@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/01 17:58:09 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/03 18:26:50 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int	handle_esc(int keycode, t_fdf *fdf)
 }
 
 /*
-
 
 
 # renklendirme (if (!start.has_color && !end.has_color))
@@ -48,16 +47,23 @@ bresenham algoritması bu iki nokta arasındaki pikselleri tek tek hesaplayıp h
 void	render_line(t_fdf *fdf, t_point start, t_point end)
 {
 	t_line line;
+	t_point	new_start;
+	t_point	new_end;
 
 	line.start = start;
 	line.end = end;
-	if (!start.has_color && !end.has_color)
-	{
-		line.start.color = 0XFFFFFF;	// white
-		line.end.color = 0XFFFFFF;
-	}
-	
-	isometric(&line); // 3D -> 2D
+
+	// isometric projection	(// 3D -> 2D)
+	new_start.x = (line.start.x - line.start.y) * cos(THIRTY_DEGREE_ANG);			// İzometrik projeksiyonda yeni X koordinatını hesaplar
+	new_start.y = (line.start.x + line.start.y) * sin(THIRTY_DEGREE_ANG) - line.start.z;		// Yeni Y koordinatını hesaplar.
+	// Sonra hesaplanan değerler orijinal yapıya geri yazılıyor:
+	line.start.x = new_start.x;
+	line.start.y = new_start.y;
+	// aynı işlemi bitiş (end) içinde uygulanıyor
+	new_end.x = (line.end.x - line.end.y) * cos(THIRTY_DEGREE_ANG);
+	new_end.y = (line.end.x + line.end.y) * sin(THIRTY_DEGREE_ANG) - line.end.z;
+	line.end.x = new_end.x;
+	line.end.y = new_end.y;
 
 	// scale/ölçekleme
 	line.start.x *= fdf->cam->scale_factor;
@@ -89,14 +95,14 @@ void	render_image(t_fdf *fdf, t_map *map)
 	int	y;
 
 	y = 0;
-	while (y < map->maxY)	// height (Satırları gezer (Yukarıdan aşağıya))
+	while (y < map->height)	// height (Satırları gezer (Yukarıdan aşağıya))
 	{
 		x = 0;
-		while (x < map->maxX)	// width (Sütunları gezer (Soldan sağa))
+		while (x < map->width)	// width (Sütunları gezer (Soldan sağa))
 		{
-			if (x < map->maxX - 1) // bunu yapmamızın sebebi son sütüna geldiğinde ve x + 1 yaptığımızda hata alırız çünkü son saıtr bir sonraki sütün yok ki
+			if (x < map->width - 1) // bunu yapmamızın sebebi son sütüna geldiğinde ve x + 1 yaptığımızda hata alırız çünkü son saıtr bir sonraki sütün yok ki
 				render_line(fdf, map->coord[x][y], map->coord[x + 1][y]);
-			if (y < map->maxY - 1)
+			if (y < map->height - 1)
 				render_line(fdf, map->coord[x][y], map->coord[x][y + 1]);
 			x++;
 		}
@@ -142,8 +148,6 @@ int	main(int argc, char **argv)
 	return (0);
 }
 
-// pylone.fdf haritası çalışmıyıor çünkü 0 eşit değil galiba
-
 /*
 Proje akış şeması
 
@@ -153,8 +157,8 @@ Proje akış şeması
 
 
 /* README.md FDF
-Bu proje, 3D .fdf dosyayı/haritayı 2D ortamda/ekranda izometrik projeksiyon 
-ile ekranda tel kafes (wireframe) şeklinde çizmek.
+Bu proje, 3D .fdf dosyayı/haritayı 2D ortamda/ekranda izometrik projeksiyon
+ile ekranda tel kafes (wireframe) şeklinde/moelinde çizmek.
 
 GENEL
 - map x

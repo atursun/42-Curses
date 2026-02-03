@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:01:38 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/01 17:29:09 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/03 15:07:14 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ typedef struct s_point
 typedef struct s_map
 {
 	t_point	**coord;
-	int		maxX;
-	int		maxY;
+	int		width;
+	int		height;
 }	t_map;
 
 typedef struct s_line
@@ -78,7 +78,7 @@ typedef struct s_fdf
 }	t_fdf;			// ana struct'ım bu içinde map, cam, image vb.. yapılarım var
 
 # define WIDTH				2000
-# define HEIGHT				1500
+# define HEIGHT				1800
 # define THIRTY_DEGREE_ANG  0.52359877		// radyan cinsinden. | (PI / 6) -> 30 yapabilirsin
 
 t_map	*parse_map(char *file, t_fdf *fdf);
@@ -87,6 +87,5 @@ t_point	**allocate_coordinates(int width, int depth);
 int		free_all(t_fdf *fdf);
 void	free_map(t_fdf *fdf);
 void	bresenham(t_fdf *fdf, t_point start, t_point end);
-void	isometric(t_line *line);
 
 #endif

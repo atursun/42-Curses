@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 12:59:28 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/01 17:36:21 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/03 12:56:43 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ Harita ekranın köşesinde kalır ve merkezlenmiş olmaz.
 
 Bu kod ise noktaları oluştururken aynı anda merkeze kaydırır. X ve Y değerlerinden haritanın yarısını çıkararak 
 koordinatları negatif–pozitif aralığa taşır ve haritayı doğrudan (0,0) merkezine yerleştirir.
-- map->coord[x][y].x = x - map->maxX / 2;
-- map->coord[x][y].y = y - map->maxY / 2;
+- map->coord[x][y].x = x - map->width / 2;
+- map->coord[x][y].y = y - map->height / 2;
 
 Haritayı koordinat sisteminin MERKEZİNE (ORJİN) taşımak.
 - Dosyadan okunan harita koordinatları varsayılan olarak (0,0) köşesinden başlar.
@@ -62,7 +62,6 @@ Haritayı koordinat sisteminin MERKEZİNE (ORJİN) taşımak.
 ---
 
 
-
 */
 void	place_the_point(char *point, t_map *map, int x, int y)
 {
@@ -70,8 +69,8 @@ void	place_the_point(char *point, t_map *map, int x, int y)
 
 	// map->coord[x][y].x = x;
 	// map->coord[x][y].y = y;
-	map->coord[x][y].x = x - map->maxX / 2;
-	map->coord[x][y].y = y - map->maxY / 2;
+	map->coord[x][y].x = x - map->width / 2;
+	map->coord[x][y].y = y - map->height / 2;
 	if (ft_strchr(point, ','))	// renk varmı kontrol edilir
 	{
 		vertex = ft_split(point, ',');
@@ -103,9 +102,9 @@ void	get_points(t_fdf *fdf)
 		if (!split) 
 			return ;
 		x = 0;	// sütün sayısı (width)
-		while (split[x])
+		while (split[x] != NULL)
 		{
-			if (x < fdf->map->maxX)
+			if (x < fdf->map->width)
 				place_the_point(split[x], fdf->map, x, y);
 			free(split[x]);
 			x++;
@@ -152,25 +151,21 @@ t_map	*parse_map(char *file, t_fdf *fdf)
 	if (!fdf->map)
 		return (NULL);
 	fd = open(file, O_RDONLY);
-	if (fd  == -1) {
+	if (fd  == -1)
 		return (NULL);
-	}
 	if (read_map(fd, fdf) == 0) {
 		free(fdf->map);
 		free(fdf->map_line.line);
 		close(fd);
 		return (NULL);
 	}
-	fdf->map->maxX = calculate_number_of_column(fdf);	// sütün sayısı (width) al
-	fdf->map->maxY = fdf->map_line.count_line;		// satır sayısı (row) al
-	if (fdf->map->maxX == 0 || fdf->map->maxY == 0) {
+	fdf->map->width = calculate_number_of_column(fdf);	// sütün sayısı (width) al
+	fdf->map->height = fdf->map_line.count_line;		// satır sayısı (row) al
+	if (fdf->map->width == 0 || fdf->map->height == 0)
 		return (NULL);
-	}
-	fdf->map->coord = allocate_coordinates(fdf->map->maxX, fdf->map->maxY);
-	if (!fdf->map->coord) {
+	fdf->map->coord = allocate_coordinates(fdf->map->width, fdf->map->height);
+	if (!fdf->map->coord)
 		return (NULL);
-	}
-	// get_points(fdf);
 	get_points(fdf);
 	ft_free(fdf->map_line.line);
 	return (fdf->map);

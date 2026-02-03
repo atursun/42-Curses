@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:30 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/01 17:53:12 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/03 15:07:21 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ float	scale_to_fit(t_map *map)
 	float	scale_y;
 	float	scale_factor;
 
-	scale_x = WIDTH / map->maxX;
-	scale_y = HEIGHT / map->maxY;
+	scale_x = WIDTH / map->width;
+	scale_y = HEIGHT / map->height;
 	scale_factor = min(scale_x, scale_y);
 	if (scale_factor < 4)
 		return (2);
@@ -96,21 +96,6 @@ void init_mlx_image_cam(t_fdf	*fdf)
 	cam->move_x = WIDTH / 2;
 	cam->move_y = HEIGHT / 2;
 	fdf->cam = cam;
-}
-
-void	isometric(t_line *line)
-{
-	t_point	new_start;
-	t_point	new_end;
-
-	new_start.x = (line->start.x - line->start.y) * cos(THIRTY_DEGREE_ANG);
-	new_start.y = (line->start.x + line->start.y) * sin(THIRTY_DEGREE_ANG) - line->start.z;
-	line->start.x = new_start.x;
-	line->start.y = new_start.y;
-	new_end.x = (line->end.x - line->end.y) * cos(THIRTY_DEGREE_ANG);
-	new_end.y = (line->end.x + line->end.y) * sin(THIRTY_DEGREE_ANG) - line->end.z;
-	line->end.x = new_end.x;
-	line->end.y = new_end.y;
 }
 
 /*
