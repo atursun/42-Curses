@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:56 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 14:23:49 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 21:55:28 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Ama bu 4 byte belleğe iki farklı şekilde yazılabilir:
 1. [AA][RR][GG][BB] -> Big Endian
 2. [BB][GG][RR][AA] -> Little Endian
 
-
 image->buffer Nedir -> Ekrandaki tüm pikselleri tutan ham byte dizisi
 
 Bit kaydırmamızın sebebi:
@@ -49,14 +48,15 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 	
 	// Endian Kontrolü (2 ihtimal var)
 	// Bu bloklar, color değişkenindeki 32 bitlik rengi, bilgisayarın endian tipine uygun şekilde image buffer içine doğru byte sırasıyla yazar.
-	if (image->endian == 1)	// big endian
+	if (image->endian == 1)	// big endian (sonuç olarak 0XAARRGGBB)
 	{
-		image->buffer[pixel + 0] = (color >> 24);
+		// Rengin ALPHA bileşenini alıp buffer’ın ilk byte’ına yazıyor.
+		image->buffer[pixel + 0] = (color >> 24);	// 0x000000AA (sonuç: Sadece Alpha byte’ını elde etmiş oluruz.)
 		image->buffer[pixel + 1] = (color >> 16);
 		image->buffer[pixel + 2] = (color >> 8);
 		image->buffer[pixel + 3] = (color);
 	}
-	else if (image->endian == 0)  // little endian
+	else if (image->endian == 0)  // little endian	(sonuç olarak 0XBBGGRRAA)
 	{
 		image->buffer[pixel + 0] = (color);
 		image->buffer[pixel + 1] = (color >> 8);
@@ -67,6 +67,20 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 
 /* Ekrana iki nokta arasında çizgi çizmek
 - start noktasından end noktasına kadar piksel piksel bir çizgi oluştur
+
+end.x ve end.y değerlerini kullanmıyor gibi görebilirsin ama 
+şurası önemli: (yani zaten burada kullanmışız yani uzunluğunu ve yönünü almışız)
+	- dx = end.x - start.x;
+	- dy = end.y - start.y;
+
+Bu satırlar şunu yapıyor:
+“start noktasından end noktasına gitmek için
+X’te ne kadar ilerlemem lazım?”
+“Y’de ne kadar ilerlemem lazım?”
+
+Bresenham algoritması mantığı:
+End noktası:
+👉 SADECE çizginin yönünü ve uzunluğunu hesaplamak için kullanılır.
 */
 void	bresenham(t_fdf *fdf, t_point start, t_point end)
 {
@@ -97,21 +111,6 @@ void	bresenham(t_fdf *fdf, t_point start, t_point end)
 	}
 }
 
-void	free_map(t_fdf *fdf)
-{
-	int i;
-
-	i = 0;
-	while (i < fdf->map->width)		// free coordinates
-		free(fdf->map->coord[i++]);
-	free(fdf->map->coord);
-	free(fdf->map);
-	mlx_destroy_window(fdf->mlx, fdf->win);
-	mlx_destroy_display(fdf->mlx);
-	free(fdf);
-	exit(1);
-}
-
 int	free_all(t_fdf *fdf)
 {
 	int i;
@@ -123,11 +122,10 @@ int	free_all(t_fdf *fdf)
 	free(fdf->map);
 	mlx_destroy_image(fdf->mlx, fdf->image->image);
 	free(fdf->image);
-	free(fdf->cam);
 	mlx_destroy_window(fdf->mlx, fdf->win);
 	mlx_destroy_display(fdf->mlx);
 	free(fdf->mlx);
 	free(fdf);
-	exit(1);
+	exit(0);
 	return (0);
 }

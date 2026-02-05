@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:01:38 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 15:07:14 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 21:29:19 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,6 @@ typedef struct s_image
 	t_line	*line;
 }	t_image;
 
-typedef struct s_cam
-{
-	float	scale_factor;
-	float	move_x;
-	float	move_y;
-}	t_cam;
-
 typedef struct s_map_lines
 {
 	char 	**line;
@@ -69,12 +62,10 @@ typedef struct s_fdf
 {
 	void		*mlx;
 	void		*win;
-	int			winX;
-	int			winY;
 	t_image		*image;
-	t_cam		*cam;
 	t_map		*map;
 	t_map_lines map_line;
+	float		scale_factor;
 }	t_fdf;			// ana struct'ım bu içinde map, cam, image vb.. yapılarım var
 
 # define WIDTH				2000
@@ -82,10 +73,10 @@ typedef struct s_fdf
 # define THIRTY_DEGREE_ANG  0.52359877		// radyan cinsinden. | (PI / 6) -> 30 yapabilirsin
 
 t_map	*parse_map(char *file, t_fdf *fdf);
-void	init_mlx_image_cam(t_fdf *fdf);
+void	init_mlx_image(t_fdf *fdf);
 t_point	**allocate_coordinates(int width, int depth);
+float	scale_to_fit(t_map *map);
 int		free_all(t_fdf *fdf);
-void	free_map(t_fdf *fdf);
 void	bresenham(t_fdf *fdf, t_point start, t_point end);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 12:59:28 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 12:56:43 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 21:13:13 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,4 +170,3 @@ t_map	*parse_map(char *file, t_fdf *fdf)
 	ft_free(fdf->map_line.line);
 	return (fdf->map);
 }
-

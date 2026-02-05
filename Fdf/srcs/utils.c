@@ -6,23 +6,47 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:30 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 15:07:21 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 21:44:35 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+/* Haritayı ekrana sığdırmak için uygun bir ölçek (scale) değeri hesaplıyor.
+- Map çok büyükse → küçültüyor
+- Map çok küçükse → büyütüyor
+- Sonuçta ekrana düzgün sığacak bir zoom katsayısı üretiyor
+
+ÖZETLE
+Bu fonksiyon şunu yapıyor:
+- Map’i ekrana tam sığdırmak için gereken X ve Y ölçeğini hesapla
+- Taşmaması için küçük olan ölçeği seç
+- Çok küçük çıkarsa minimum 2 yap
+- Sonucu biraz küçült (÷2) ki ekrana rahat otursun
+*/
 float	scale_to_fit(t_map *map)
 {
-	float	scale_x;
-	float	scale_y;
-	float	scale_factor;
+	float	scale_x;			// X ekseni için ölçek
+	float	scale_y;			// y ekseni için ölçek
+	float	scale_factor;		// Son seçilen ölçek
 
 	scale_x = WIDTH / map->width;
 	scale_y = HEIGHT / map->height;
-	scale_factor = min(scale_x, scale_y);
+	// Eğer büyük olanı seçersek harita ekrana sığmaz, taşar
+	scale_factor = min(scale_x, scale_y);	// X ve Y’den küçük olanı seçiyor (Hangisi daha uygunsa onu seç)
+	/*
+	Eğer hesaplanan ölçek çok küçükse:
+	Bu durumda harita: aşırı küçük ve okunmaz olur
+	O yüzden diyor ki: “Scale 4’ten küçük çıkarsa, direkt 2 yap”
+	Çok küçülmesine izin verme
+	*/
 	if (scale_factor < 4)
 		return (2);
+	/* Hesaplanan ölçeği biraz küçültüyor 
+	Bunun sebebi genelde:
+		1. Kenarlarda boşluk bırakmak
+		2. Haritanın pencereye yapışmaması
+	*/
 	return (scale_factor / 2);
 }
 
@@ -57,17 +81,14 @@ mlx_get_data_addr: “Oluşturduğun image’ın piksellerine direkt erişebilme
 - Kamera ayarlarını ayarlar
 - Tüm bunları t_fdf yapısına bağlar
 */
-void init_mlx_image_cam(t_fdf	*fdf)
+void init_mlx_image(t_fdf *fdf)
 {
 	t_image	*image;
-	t_cam	*cam;
 
 	// mlx init
 	// Artık ekranda çizim yapabileceğimiz bir pencere oluştu
 	fdf->mlx = mlx_init(); // MiniLibX kütüphanesini başlatır. Grafik sistemiyle iletişim kurmamızı sağlar.
-	fdf->winX = WIDTH;
-	fdf->winY = HEIGHT;
-	fdf->win = mlx_new_window(fdf->mlx, fdf->winX, fdf->winY, "FDF");		// Ekranda bir pencere açar ve ayarlarını veririz
+	fdf->win = mlx_new_window(fdf->mlx, WIDTH, HEIGHT, "FDF");		// Ekranda bir pencere açar ve ayarlarını veririz
 
 	// image init
 	/*
@@ -83,37 +104,24 @@ void init_mlx_image_cam(t_fdf	*fdf)
 			&image->line_bytes, &image->endian);
 	image->line = NULL;
 	fdf->image = image;	// burada ise image'ı ana yapıya bağlıyoruz
-
-	// camera init
-	/*
-	Ekrandaki konum, Kaydırma (move) bilgileri tarzı bilgileri tutar
-	*/
-	cam = malloc(sizeof(t_cam));
-	if (!cam)
-		return ;
-	cam->scale_factor = scale_to_fit(fdf->map);	// Haritayı ekrana sığdıracak uygun zoom değerini hesaplar (Çok büyük bir map ise → küçültür, Çok küçük ise → büyütür)
-	// Kamerayı ekranın ortasına koyar (Çizimler pencerenin tam ortasında başlasın diye)
-	cam->move_x = WIDTH / 2;
-	cam->move_y = HEIGHT / 2;
-	fdf->cam = cam;
 }
 
 /*
 Harita için 2 boyutlu t_point matrisi oluşturmak.
 Yani, “FDF haritasının tüm noktalarını tutacak 2 boyutlu bellek alanını oluşturur.”
 */
-t_point	**allocate_coordinates(int width, int depth)
+t_point	**allocate_coordinates(int x, int y)
 {
 	int		i;
 	t_point	**coordinates;
 
-	coordinates = malloc(width * sizeof(t_point *));
+	coordinates = malloc(x * sizeof(t_point *));
 	if (!coordinates)
 		return (NULL);
 	i = 0;
-	while (i < width)
+	while (i < x)
 	{
-		coordinates[i] = malloc(depth * sizeof(t_point));
+		coordinates[i] = malloc(y * sizeof(t_point));
 		if (!coordinates[i])
 			return (NULL);
 		i++;

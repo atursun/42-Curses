@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 18:26:50 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 22:08:06 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,16 +66,16 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	line.end.y = new_end.y;
 
 	// scale/ölçekleme
-	line.start.x *= fdf->cam->scale_factor;
-	line.start.y *= fdf->cam->scale_factor;
-	line.end.x *= fdf->cam->scale_factor;
-	line.end.y *= fdf->cam->scale_factor;
+	line.start.x *= fdf->scale_factor;
+	line.start.y *= fdf->scale_factor;
+	line.end.x *= fdf->scale_factor;
+	line.end.y *= fdf->scale_factor;
 
 	// translate/öteleme/move
-	line.start.x += fdf->cam->move_x;
-	line.start.y += fdf->cam->move_y;
-	line.end.x += fdf->cam->move_x;
-	line.end.y += fdf->cam->move_y;
+	line.start.x += WIDTH / 2;
+	line.start.y += HEIGHT / 2;
+	line.end.x += WIDTH / 2;
+	line.end.y += HEIGHT / 2;
 
 	// Pikselleştirme (Rasterization)
 	bresenham(fdf, line.start, line.end);
@@ -95,6 +95,7 @@ void	render_image(t_fdf *fdf, t_map *map)
 	int	y;
 
 	y = 0;
+	fdf->scale_factor = scale_to_fit(fdf->map);	// Haritayı ekrana sığdıracak uygun zoom değerini hesaplar (Çok büyük bir map ise → küçültür, Çok küçük ise → büyütür)
 	while (y < map->height)	// height (Satırları gezer (Yukarıdan aşağıya))
 	{
 		x = 0;
@@ -112,18 +113,50 @@ void	render_image(t_fdf *fdf, t_map *map)
 
 int	is_file_extension_valid(char *filename)
 {
-	char	*res;
+	char	*ext;
+	char	*name;
 	int		fd;
 
+	// Dosya açılabiliyor mu?
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 		return (1);
-	res = ft_strrchr(filename, '/');
-	if (!ft_strncmp(res, "/.fdf", 5))
+	close(fd);
+
+	// Uzantıyı bul
+	ext = ft_strrchr(filename, '.');
+	if (!ext)
+		return (1);
+
+	// Dosya adı kısmını bul (son '/' dan sonrası)
+	name = ft_strrchr(filename, '/');
+	if (name)
+		name++;        // '/' sonrası gerçek dosya adı
+	else
+		name = filename;
+
+	// Gizli dosya mı? (ör: .fdf, .test.fdf)
+	if (name[0] == '.')
+		return (1);
+
+	// Uzantı kontrolü
+	if (ft_strncmp(ext, ".fdf", 5) != 0)
 		return (1);
 	return (0);
 }
 
+/*
+mlx_key_hook-> Sadece klavye tuşlarına özel, hazır kısayol fonksiyonu
+	- mlx_key_hook(window, key_function, param);
+		- “Bu pencereye basılan her tuşta şu fonksiyonu çağır”
+
+mlx_hook-> Her türlü olayı (keyboard, mouse, window close vs.) yakalayabilen genel fonksiyon
+	- mlx_hook(win, event, mask, function, param);
+		- “Belirli bir olayı yakala ve şu fonksiyonu çalıştır”
+
+event: Yakalamak istediğin olayın türüdür (örneğin: tuşa basma, tuş bırakma, mouse click, pencere kapatma gibi hangi olayın tetikleneceğini belirtir).
+mask: O olayın hangi koşullarda dinleneceğini belirten filtredir; hangi alt durumların yakalanacağını söyler (örneğin sadece KeyPress’i mi, KeyRelease’i mi dinleyeceksin).
+*/
 int	main(int argc, char **argv)
 {
 	t_fdf	*fdf;
@@ -138,7 +171,7 @@ int	main(int argc, char **argv)
 		free(fdf);
 		return (1);
 	}
-	init_mlx_image_cam(fdf);
+	init_mlx_image(fdf);
 	render_image(fdf, fdf->map);
 	mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->image->image, 0, 0);
 	mlx_string_put(fdf->mlx, fdf->win, 50, 100, 0XC70839, "PRESS 'ESC' TO CLOSE");
@@ -152,6 +185,8 @@ int	main(int argc, char **argv)
 Proje akış şeması
 
 1. Map parsing: .map dosyası -> satır satır oku -> sütun sayısını kontrol et -> 3D noktaları oluştur (x, y, z, color) -> haritayı merkeze al
+2. init mlx: mlx init eder -> pencere oluşturur -> image oluşturur
+3. rendering: noktaları isometric yapar -> scale -> translate -> noktaları çizer ve belleğe rengi çizer
 
 */
 
