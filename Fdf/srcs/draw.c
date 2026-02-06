@@ -45,7 +45,7 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 	-> Yani: adres = satır başlangıcı + sütun offseti
 	*/
 	pixel = ((int)y * image->line_bytes) + ((int)x * 4);	// Bellekte Piksel Adresini Bulma (“Bu piksel bellekte tam olarak nereye denk geliyor?” hesabını yapar.)
-	
+
 	// Endian Kontrolü (2 ihtimal var)
 	// Bu bloklar, color değişkenindeki 32 bitlik rengi, bilgisayarın endian tipine uygun şekilde image buffer içine doğru byte sırasıyla yazar.
 	if (image->endian == 1)	// big endian (sonuç olarak 0XAARRGGBB)
@@ -71,7 +71,7 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 end.x ve end.y değerlerini kullanmıyor gibi görebilirsin ama 
 şurası önemli: (yani zaten burada kullanmışız yani uzunluğunu ve yönünü almışız)
 	- dx = end.x - start.x;
-	- dy = end.y - start.y;
+	- dy = end.y - start.y;	
 
 Bu satırlar şunu yapıyor:
 “start noktasından end noktasına gitmek için

@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/06 12:40:48 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/06 15:23:33 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	new_end.y = (line.end.x + line.end.y) * sin(THIRTY_DEGREE_ANG) - line.end.z;
 	line.end.x = new_end.x;
 	line.end.y = new_end.y;
-	line.start.x *= fdf->cam->scale_factor;
-	line.start.y *= fdf->cam->scale_factor;
-	line.end.x *= fdf->cam->scale_factor;
-	line.end.y *= fdf->cam->scale_factor;
-	line.start.x += fdf->cam->move_x;
-	line.start.y += fdf->cam->move_y;
-	line.end.x += fdf->cam->move_x;
-	line.end.y += fdf->cam->move_y;
+	line.start.x *= fdf->scale_factor;
+	line.start.y *= fdf->scale_factor;
+	line.end.x *= fdf->scale_factor;
+	line.end.y *= fdf->scale_factor;
+	line.start.x += fdf->move_x;
+	line.start.y += fdf->move_y;
+	line.end.x += fdf->move_x;
+	line.end.y += fdf->move_y;
 	bresenham(fdf, line.start, line.end);
 }
 

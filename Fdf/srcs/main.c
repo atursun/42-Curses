@@ -205,5 +205,4 @@ KOD MANTIĞI
 - bütün kodu anla
 - neden bresenham gibi
 - her şeyi detayılca
-
 */
