@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:56 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/03 15:50:16 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/07 12:40:38 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 	}
 }
 
-void	bresenham(t_fdf *fdf, t_point start, t_point end)
+void	dda(t_fdf *fdf, t_point start, t_point end)
 {
 	float	dx;
 	float	dy;
@@ -44,9 +44,12 @@ void	bresenham(t_fdf *fdf, t_point start, t_point end)
 		start.color = 0XFFFFFF;
 	dx = end.x - start.x;
 	dy = end.y - start.y;
-	steps = max(absolute(dx), absolute(dy));
-	dx /= steps;
-	dy /= steps;
+	if (absolute(dx) > absolute(dy))
+		steps = absolute(dx);
+	else
+		steps = absolute(dy);
+	dx = dx / steps;
+	dy = dy / steps;
 	i = 0;
 	while (i <= steps)
 	{

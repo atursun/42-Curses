@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/05 21:19:25 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/07 12:40:51 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	line.start.y += HEIGHT / 2;
 	line.end.x += WIDTH / 2;
 	line.end.y += HEIGHT / 2;
-	bresenham(fdf, line.start, line.end);
+	dda(fdf, line.start, line.end);
 }
 
 void	render_image(t_fdf *fdf, t_map *map)

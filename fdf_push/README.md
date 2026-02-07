@@ -95,7 +95,7 @@ The `.fdf` file is a text-based format where each number represents a 3D point:
 ## Resources
 
 - [MiniLibX Documentation](https://harm-smits.github.io/42docs/libs/minilibx)
-- [Bresenham's Line Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
+- [DDA's Line Algorithm](https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm))
 - [Isometric Projection](https://en.wikipedia.org/wiki/Isometric_projection)
 
 **AI Usage**

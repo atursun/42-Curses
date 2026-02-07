@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:00:56 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/05 21:55:28 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/07 13:53:47 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,9 @@ void	pixel_to_image(t_image *image, float x, float y, int color)
 	}
 }
 
-/* Ekrana iki nokta arasında çizgi çizmek
+/* DDA algoritması, iki nokta arasındaki çizgiyi küçük küçük adımlara bölerek çizer.
+* 
+
 - start noktasından end noktasına kadar piksel piksel bir çizgi oluştur
 
 end.x ve end.y değerlerini kullanmıyor gibi görebilirsin ama 
@@ -81,8 +83,25 @@ X’te ne kadar ilerlemem lazım?”
 Bresenham algoritması mantığı:
 End noktası:
 👉 SADECE çizginin yönünü ve uzunluğunu hesaplamak için kullanılır.
+
+
+2D gösterimi
+start (2,3) - end (5, 4)
+
+dx = 5 - 2 -> 3
+dy = 4 - 3 -> 1
+
+dx = 3 / 3
+dy = 1 / 3
+
+
+https://www.geogebra.org/m/VWN3g9rE
+cordinate plane
+
+
 */
-void	bresenham(t_fdf *fdf, t_point start, t_point end)
+
+void	dda(t_fdf *fdf, t_point start, t_point end)
 {
 	float	dx;
 	float	dy;
@@ -94,12 +113,28 @@ void	bresenham(t_fdf *fdf, t_point start, t_point end)
 	// X ve Y farklarını hesaplama: Çizginin yatay ve dikey uzunluğunu bulur.
 	dx = end.x - start.x;
 	dy = end.y - start.y;
-	// Kaç adımda ilerleyeceğini belirleme: Çizgi X yönünde mi uzuyor Yoksa Y yönünde mi. Buna bakıp: En uzun ekseni adım sayısı yapıyor.
-	steps = max(absolute(dx), absolute(dy));
-	// Her adımda ne kadar ilerleyeceğimizi bulma: dx ve dy artık: “Her iterasyonda ne kadar ilerleyeceğim?” anlamına gelir.
-	dx /= steps;
-	dy /= steps;
+	/* Kaç adımda çizileceğini belirle
+	Burada mantık:
+		Çizgi daha çok X yönünde mi uzun?
+		Yoksa Y yönünde mi?
+	Hangisi daha uzunsa: O eksen kadar adım at!
+	*/
+	if (absolute(dx) > absolute(dy))
+		steps = absolute(dx);
+	else
+		steps = absolute(dy);
+
+	/* Her adımda ne kadar ilerleyeceğini hesapla
+	Artık dx ve dy: “Her döngüde x ve y’yi ne kadar artıracağım?” anlamına gelir.
+	*/
+	dx = dx / steps;
+	dy = dy / steps;
 	i = 0;
+	/* Döngü ile çizim
+	- Başlangıç noktasından başla
+	- Adım adım son noktaya doğru ilerle
+	- Her adımda bir piksel çiz
+	*/
 	while (i <= steps) 	// Çizim Döngüsü (Çizgi üzerindeki tüm noktaları tek tek gezer) 
 	{
 		if ((start.x > 0 && start.y > 0) && (start.x < WIDTH && start.y < HEIGHT)) // Ekran Sınırı Kontrolü (Eğer nokta ekranın dışındaysa çizme!)

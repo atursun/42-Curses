@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:01:38 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/05 21:29:19 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/07 12:38:49 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,6 @@ void	init_mlx_image(t_fdf *fdf);
 t_point	**allocate_coordinates(int width, int depth);
 float	scale_to_fit(t_map *map);
 int		free_all(t_fdf *fdf);
-void	bresenham(t_fdf *fdf, t_point start, t_point end);
+void	dda(t_fdf *fdf, t_point start, t_point end);
 
 #endif

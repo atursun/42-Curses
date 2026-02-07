@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/05 22:08:06 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/07 12:38:52 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	line.end.y += HEIGHT / 2;
 
 	// Pikselleştirme (Rasterization)
-	bresenham(fdf, line.start, line.end);
+	dda(fdf, line.start, line.end);
 }
 
 /*
