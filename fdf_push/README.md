@@ -66,7 +66,7 @@ make re
 The program is run from the command line with a `.fdf` map file:
 
 ```bash
-./fdf test_map/<map_name>.fdf
+./fdf maps/42.fdf
 ```
 
 ### Controls
@@ -98,6 +98,6 @@ The `.fdf` file is a text-based format where each number represents a 3D point:
 - [Bresenham's Line Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm)
 - [Isometric Projection](https://en.wikipedia.org/wiki/Isometric_projection)
 
-### AI Usage
+**AI Usage**
 
 AI tools were used only for concept clarification, understanding isometric projection mathematics, guidance during debugging, and drafting the README.md No project code was generated or modified by AI.

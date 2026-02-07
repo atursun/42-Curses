@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 12:23:48 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/06 12:40:48 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/05 21:19:25 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ void	render_line(t_fdf *fdf, t_point start, t_point end)
 	new_end.y = (line.end.x + line.end.y) * sin(THIRTY_DEGREE_ANG) - line.end.z;
 	line.end.x = new_end.x;
 	line.end.y = new_end.y;
-	line.start.x *= fdf->cam->scale_factor;
-	line.start.y *= fdf->cam->scale_factor;
-	line.end.x *= fdf->cam->scale_factor;
-	line.end.y *= fdf->cam->scale_factor;
-	line.start.x += fdf->cam->move_x;
-	line.start.y += fdf->cam->move_y;
-	line.end.x += fdf->cam->move_x;
-	line.end.y += fdf->cam->move_y;
+	line.start.x *= fdf->scale_factor;
+	line.start.y *= fdf->scale_factor;
+	line.end.x *= fdf->scale_factor;
+	line.end.y *= fdf->scale_factor;
+	line.start.x += WIDTH / 2;
+	line.start.y += HEIGHT / 2;
+	line.end.x += WIDTH / 2;
+	line.end.y += HEIGHT / 2;
 	bresenham(fdf, line.start, line.end);
 }
 
@@ -53,6 +53,7 @@ void	render_image(t_fdf *fdf, t_map *map)
 	int	y;
 
 	y = 0;
+	fdf->scale_factor = scale_to_fit(fdf->map);
 	while (y < map->height)
 	{
 		x = 0;
@@ -71,13 +72,24 @@ void	render_image(t_fdf *fdf, t_map *map)
 int	is_file_extension_valid(char *filename)
 {
 	char	*res;
+	char	*name;
 	int		fd;
 
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 		return (1);
-	res = ft_strrchr(filename, '/');
-	if (!ft_strncmp(res, "/.fdf", 5))
+	close(fd);
+	res = ft_strrchr(filename, '.');
+	if (res == NULL)
+		return (1);
+	name = ft_strrchr(filename, '/');
+	if (name)
+		name++;
+	else
+		name = filename;
+	if (name[0] == '.')
+		return (1);
+	if (ft_strncmp(res, ".fdf", 5))
 		return (1);
 	return (0);
 }
@@ -97,7 +109,7 @@ int	main(int argc, char **argv)
 		free(fdf);
 		return (1);
 	}
-	init_mlx_image_cam(fdf);
+	init_mlx_image(fdf);
 	render_image(fdf, fdf->map);
 	mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->image->image, 0, 0);
 	mlx_string_put(fdf->mlx, fdf->win, 50, 100, 0XC70839,
