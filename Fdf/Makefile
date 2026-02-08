@@ -5,7 +5,7 @@ CFLAGS = -Wall -Wextra -Werror -g
 MLX_FLAGS = -lm -lbsd -lmlx -lXext -lX11
 
 LIBFT_PATH = ./libs/libft/
-MLX_PATH = ./libs/mlx_linux/
+MLX_PATH = ./libs/minilibx-linux/
 LIBFT = $(LIBFT_PATH)libft.a
 MLX = $(MLX_PATH)libmlx.a
 
@@ -27,10 +27,10 @@ $(LIBFT):
 clean:
 	@make clean -C $(LIBFT_PATH)
 	@make clean -C $(MLX_PATH)
-	rm -rf $(OBJ)
+	@rm -rf $(OBJ)
 
 fclean: clean
-	rm -rf $(NAME)
+	@rm -rf $(NAME)
 	@make fclean -C $(LIBFT_PATH)
 
 re: fclean all

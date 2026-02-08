@@ -6,33 +6,31 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 12:59:28 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/05 21:13:13 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/08 12:05:52 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-// Haritadaki tüm satırların aynı sayıda sütuna sahip olup olmadığını kontrol etmek
-// mapte her satır aynı sayıda nokta içermeli
 int	calculate_number_of_column(t_fdf *fdf)
 {
 	int		i;
 	int		c_col;
 	int		next_col;
-	char 	*trimmed;
-	char 	*trimmed_two;
+	char	*trimmed;
+	char	*trimmed_two;
 
 	if (fdf->map_line.count_line == 0)
 		return (0);
 	trimmed_two = ft_strtrim(fdf->map_line.line[0], " \n");
-	c_col = ft_len_of_word(trimmed_two, ' ');		// İlk satır referans alınır
+	c_col = ft_len_of_word(trimmed_two, ' ');
 	free(trimmed_two);
 	i = 1;
 	while (i < fdf->map_line.count_line)
 	{
 		trimmed = ft_strtrim(fdf->map_line.line[i], " \n");
 		next_col = ft_len_of_word(trimmed, ' ');
-		if (c_col != next_col)	// Uyuşmazsa → harita bozuk
+		if (c_col != next_col)
 			return (0);
 		i++;
 		free(trimmed);
@@ -40,38 +38,13 @@ int	calculate_number_of_column(t_fdf *fdf)
 	return (c_col);
 }
 
-/*
-verilen string formatı (42,0xFF0000 || 5) bunları t_point yapısına yerleştiriyor
-
----
-Bu kod noktaları dosyadaki doğal haliyle yerleştirir. Koordinatlar (0,0)’dan başlar ve hep pozitif yönde büyür. 
-Harita ekranın köşesinde kalır ve merkezlenmiş olmaz.
-- map->coord[x][y].x = x;
-- map->coord[x][y].y = y;
-
-Bu kod ise noktaları oluştururken aynı anda merkeze kaydırır. X ve Y değerlerinden haritanın yarısını çıkararak 
-koordinatları negatif–pozitif aralığa taşır ve haritayı doğrudan (0,0) merkezine yerleştirir.
-- map->coord[x][y].x = x - map->width / 2;
-- map->coord[x][y].y = y - map->height / 2;
-
-Haritayı koordinat sisteminin MERKEZİNE (ORJİN) taşımak.
-- Dosyadan okunan harita koordinatları varsayılan olarak (0,0) köşesinden başlar.
-- Bu durum haritanın ekranın köşesinde kalmasına ve dönüşlerin dengesiz olmasına yol açar.
-- Koordinatları merkeze kaydırmak, tüm noktaları (0,0) etrafında simetrik hale getirir.
-- Böylece zoom, döndürme ve çizim işlemleri matematiksel olarak doğru ve düzgün çalışır.
----
-
-
-*/
 void	place_the_point(char *point, t_map *map, int x, int y)
 {
-	char	**vertex;	// Vertex, 3D (veya 2D) uzayda bir şeklin tek bir köşe/noktasıdır. FDF’de 2,0xff gibi bir ifade, yüksekliği ve rengi olan bir vertexi temsil eder.
+	char	**vertex;
 
-	// map->coord[x][y].x = x;
-	// map->coord[x][y].y = y;
 	map->coord[x][y].x = x - map->width / 2;
 	map->coord[x][y].y = y - map->height / 2;
-	if (ft_strchr(point, ','))	// renk varmı kontrol edilir
+	if (ft_strchr(point, ','))
 	{
 		vertex = ft_split(point, ',');
 		map->coord[x][y].z = ft_atoi(vertex[0]);
@@ -79,29 +52,26 @@ void	place_the_point(char *point, t_map *map, int x, int y)
 		map->coord[x][y].has_color = 1;
 		ft_free(vertex);
 	}
-	else	// eğer renk yoksa sadece yükselik değeri alınır ve ilerleyen süreçlerde color değeri atanır.
+	else
 	{
 		map->coord[x][y].z = ft_atoi(point);
 		map->coord[x][y].has_color = 0;
 	}
 }
 
-/*
-tek tek her noktayı coord'a ekliyorum 
-*/
 void	get_points(t_fdf *fdf)
 {
 	char	**split;
 	int		x;
 	int		y;
 
-	y = 0;	// satır sayısı (height)
+	y = 0;
 	while (y < fdf->map_line.count_line)
 	{
 		split = ft_split(fdf->map_line.line[y], ' ');
-		if (!split) 
+		if (!split)
 			return ;
-		x = 0;	// sütün sayısı (width)
+		x = 0;
 		while (split[x] != NULL)
 		{
 			if (x < fdf->map->width)
@@ -114,21 +84,14 @@ void	get_points(t_fdf *fdf)
 	}
 }
 
-
-
-
-/*
-bu fonksiyon açıklan dosyanın fd sini alıyor ve get_next_line ile dosyayı satır satır okuyor
-okudğu her satırı ise struct'e ekliyor
-bunu yapmamın nedeni başka fonksiyonlarda tekrar tekrar açmamak
-
-*/
-int read_map(int fd, t_fdf *fdf) {
+int	read_map(int fd, t_fdf *fdf)
+{
 	fdf->map_line.count_line = 0;
-	fdf->map_line.line = malloc(sizeof(char *) * 10000);	// maximum 10000 satır gibi düşün
+	fdf->map_line.line = malloc(sizeof(char *) * 100000);
 	if (!fdf->map_line.line)
 		return (0);
-	while (fdf->map_line.count_line < 10000) {
+	while (fdf->map_line.count_line < 100000)
+	{
 		fdf->map_line.line[fdf->map_line.count_line] = get_next_line(fd);
 		if (fdf->map_line.line[fdf->map_line.count_line] == NULL)
 			break ;
@@ -139,10 +102,6 @@ int read_map(int fd, t_fdf *fdf) {
 	return (fdf->map_line.count_line);
 }
 
-/*
-Bu fonksiyon;
-Verilen map dosyasını açıyor, satırları tek tek okuyor, sütun/satır sayısını buluyor, noktaları oluşturuyor ve haritayı merkeze alıyor
-*/
 t_map	*parse_map(char *file, t_fdf *fdf)
 {
 	int		fd;
@@ -151,16 +110,17 @@ t_map	*parse_map(char *file, t_fdf *fdf)
 	if (!fdf->map)
 		return (NULL);
 	fd = open(file, O_RDONLY);
-	if (fd  == -1)
+	if (fd == -1)
 		return (NULL);
-	if (read_map(fd, fdf) == 0) {
+	if (read_map(fd, fdf) == 0)
+	{
 		free(fdf->map);
 		free(fdf->map_line.line);
 		close(fd);
 		return (NULL);
 	}
-	fdf->map->width = calculate_number_of_column(fdf);	// sütün sayısı (width) al
-	fdf->map->height = fdf->map_line.count_line;		// satır sayısı (row) al
+	fdf->map->width = calculate_number_of_column(fdf);
+	fdf->map->height = fdf->map_line.count_line;
 	if (fdf->map->width == 0 || fdf->map->height == 0)
 		return (NULL);
 	fdf->map->coord = allocate_coordinates(fdf->map->width, fdf->map->height);

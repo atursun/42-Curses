@@ -6,7 +6,7 @@
 /*   By: atursun <atursun@student.42istanbul.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 13:01:38 by atursun           #+#    #+#             */
-/*   Updated: 2026/02/07 12:38:49 by atursun          ###   ########.fr       */
+/*   Updated: 2026/02/08 12:14:38 by atursun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <math.h>
-# include "../libs/mlx_linux/mlx.h"
+# include "../libs/minilibx-linux/mlx.h"
 # include "../libs/libft/libft.h"
 
 typedef struct s_point
@@ -49,13 +49,12 @@ typedef struct s_image
 	int		line_bytes;
 	int		endian;
 	char	*buffer;
-	t_line	*line;
 }	t_image;
 
 typedef struct s_map_lines
 {
-	char 	**line;
-	int 	count_line;
+	char	**line;
+	int		count_line;
 }	t_map_lines;
 
 typedef struct s_fdf
@@ -64,19 +63,19 @@ typedef struct s_fdf
 	void		*win;
 	t_image		*image;
 	t_map		*map;
-	t_map_lines map_line;
+	t_map_lines	map_line;
 	float		scale_factor;
-}	t_fdf;			// ana struct'ım bu içinde map, cam, image vb.. yapılarım var
+}	t_fdf;
 
 # define WIDTH				2000
 # define HEIGHT				1800
-# define THIRTY_DEGREE_ANG  0.52359877		// radyan cinsinden. | (PI / 6) -> 30 yapabilirsin
+# define THIRTY_DEGREE_ANG  0.52359877
 
-t_map	*parse_map(char *file, t_fdf *fdf);
-void	init_mlx_image(t_fdf *fdf);
-t_point	**allocate_coordinates(int width, int depth);
-float	scale_to_fit(t_map *map);
 int		free_all(t_fdf *fdf);
+float	scale_to_fit(t_map *map);
+void	init_mlx_image(t_fdf *fdf);
+t_map	*parse_map(char *file, t_fdf *fdf);
+t_point	**allocate_coordinates(int x, int y);
 void	dda(t_fdf *fdf, t_point start, t_point end);
 
 #endif
