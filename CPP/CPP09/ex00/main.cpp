@@ -62,10 +62,8 @@ Tarih, fiyat veritabanında birebir bulunmuyorsa:
 - Database -> 2011-01-03, 0.3
 - çıktı -> 2011-01-03 => 3 = 0.9
 - çünkü: 3 (value) × 0.3 (bitcoin fiyatı) = 0.9
-
-
-
 */
+
 
 /*
 Map container
