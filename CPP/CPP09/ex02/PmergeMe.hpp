@@ -12,8 +12,8 @@
 
 class PmergeMe {
 private:
-    std::vector<int> t_vector;
-    std::deque<int>  t_deque;
+    std::vector<int> t_vector;  // Dinamik dizidir. Bellekte ardışık (contiguous) tutulur.
+    std::deque<int>  t_deque;   // Çift uçlu kuyruktur. Hem baştan hem sondan ekleme/silme hızlıdır.
 
 public:
     PmergeMe();
@@ -23,7 +23,7 @@ public:
 
     void add_to_containers(int argc, char **args);
     void sort_elements_in_vector(std::vector<int>& array);
-    void sort_elements_in_deque(std::deque<int>& array); 
+    void sort_elements_in_deque(std::deque<int>& array);
     void calculate_duration();
 };
 

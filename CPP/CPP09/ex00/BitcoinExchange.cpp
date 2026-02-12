@@ -89,7 +89,7 @@ void BitcoinExchange::process_input(std::string input_file) {
                 std::cout << "Error: bad date input" << " => " << date << std::endl;
                 continue;
             }
-            try {                
+            try {
                 double value = atof(value_str.c_str());
                 double final_result = 0;
 

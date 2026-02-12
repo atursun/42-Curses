@@ -3,10 +3,6 @@
 
 int ctrl_aruments(int argc, char **args) {
     for (int i=1; i < argc; i++) {
-        for (int j=i+1; j < argc; j++) {
-            if (atoi(args[i]) == atoi(args[j]))
-                return (1);
-        }
         std::string str = args[i];
         for (size_t j=0; j < str.size(); j++) {
             if (!std::isdigit(str[j]))
