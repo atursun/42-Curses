@@ -10,8 +10,36 @@ PmergeMe &PmergeMe::operator=(const PmergeMe& other) {
 PmergeMe::~PmergeMe() {}
 
 
-void PmergeMe::calculate_duration() {
+void PmergeMe::add_to_containers(int argc, char **args) {
+    for (int i=1; i < argc; i++) {
+        int number = atoi(args[i]);
+        t_vector.push_back(number); // vektöre ekleme
+        t_deque.push_back(number);  // deque ekleme
+    }
+}
 
+/*
+Bu fonksiyon, aynı veri kümesi üzerinde std::vector ve std::deque kullanarak sıralama işlemi yapar 
+ve gettimeofday ile mikro saniye seviyesinde performans ölçümü gerçekleştirir
+- Önce verileri yazdırır (Before)
+- vector’ü sıralar ve süresini ölçer
+- deque’yi sıralar ve süresini ölçer
+- Sonuçları ve geçen süreleri ekrana yazdırır
+
+Zaman Ölçmek İçin Kullanılan Yapı: timeval
+timeval yapısı şunları içerir:
+struct timeval {
+    long tv_sec;   // saniye
+    long tv_usec;  // mikrosaniye (1 saniye = 1.000.000 mikrosaniye)
+};
+
+
+us: mikrosaniye
+s: saniye
+
+*/
+
+void PmergeMe::calculate_duration() {
     struct timeval v_st, v_en;
     struct timeval d_st, d_en;
 
@@ -19,18 +47,34 @@ void PmergeMe::calculate_duration() {
     for (std::vector<int>::iterator it = t_vector.begin(); it != t_vector.end(); it++)
         std::cout << *it << " ";
     std::cout << std::endl;
-    std::cout << "Before d: ";
-    for (std::deque<int>::iterator it = t_deque.begin(); it != t_deque.end(); it++)
-        std::cout << *it << " ";
-    std::cout << std::endl;
 
-    gettimeofday(&v_st, NULL);
-    sort_elements_in_vector(t_vector);    // sorting algorithm
-    gettimeofday(&v_en, NULL);
+    // Yani zaman ölçümü şu aralığı kapsıyor: [ sort_elements_in_vector çalıştığı süre ]
+    gettimeofday(&v_st, NULL);              // 1. Başlangıç zamanını al
+    sort_elements_in_vector(t_vector);      // 2. Sıralama yap
+    gettimeofday(&v_en, NULL);              // 3. Bitiş zamanını al
 
-    long v_seconds = v_en.tv_sec - v_st.tv_sec;
-    long v_microseconds = v_en.tv_usec - v_st.tv_usec;
-    double v_duration = (double)v_seconds * 1000000.0 + (double)v_microseconds;
+    /* Süreyi Hesaplama Mantığı
+    Amaç: Toplam süreyi mikrosaniye cinsine çevirmek.
+    toplam süre (v_duration) = (saniye farkı × 1.000.000) + mikrosaniye farkı
+    */
+    long v_seconds = v_en.tv_sec - v_st.tv_sec;         // saniye cinsinden zaman hesaplaması
+    long v_microseconds = v_en.tv_usec - v_st.tv_usec;  // mikrosaniye cinsinden zaman hesaplaması
+    double v_duration = v_seconds * 1000000 + v_microseconds; // toplam süreyi mikrosaniye cinsinden hesaplama
+    /* Bilimsel Gösterimi (8e-06) Kapatmak için fixed() kullanmalısın
+    
+    std::fixed << std::setprecision(6) -> Bu satır cout’un yazdırma formatını değiştirir.
+    Yani, fixed Bilimsel gösterimi kapatır Ondalıklı normal sayı formatına geçirir
+    normalde double x = 0.000028; std::cout << x;
+    yaptığında çıktı 2.8e-05
+    ama fixed kullandığında bu bilimsel gösterimi kapatır ve normal bir şekilde yazdırır
+
+    eğer fixed yoksa Toplam 5 anlamlı basamak gösterir.
+    std::setprecision(5)
+    yok eğer fixed varsa, Virgülden sonra 5 basamak gösterir.
+
+    std::fixed << std::setprecision(5) bu satırın anlamı:
+    kısacası, Bundan sonra yazdıracağım tüm double değerleri Bilimsel gösterim olmadan Virgülden sonra 6 basamaklı yaz.
+    */
 
     // ------------
     gettimeofday(&d_st, NULL);
@@ -39,30 +83,18 @@ void PmergeMe::calculate_duration() {
 
     long d_seconds = d_en.tv_sec - d_st.tv_sec;
     long d_microseconds = d_en.tv_usec - d_st.tv_usec;
-    double d_duration = (double)d_seconds * 1000000.0 + (double)d_microseconds;
+    double d_duration = d_seconds * 1000000 + d_microseconds;
 
     std::cout << "After v: ";
     for (std::vector<int>::iterator it = t_vector.begin(); it != t_vector.end(); it++)
         std::cout << *it << " ";
     std::cout << std::endl;
-    std::cout << "After d: ";
-    for (std::deque<int>::iterator it = t_deque.begin(); it != t_deque.end(); it++)
-        std::cout << *it << " ";
-    std::cout << std::endl;
 
-    std::cout << "Time to process a range of " << t_vector.size()
+    std::cout << std::fixed << std::setprecision(5) << "Time to process a range of " << t_vector.size()
         << " elements with std::vector : " << v_duration << " us" << std::endl;
 
-    std::cout << "Time to process a range of " << t_deque.size() 
+    std::cout << std::fixed << std::setprecision(5) << "Time to process a range of " << t_deque.size() 
         << " elements with std::deque  : " << d_duration << " us" << std::endl;
-}
-
-void PmergeMe::add_to_containers(int argc, char **args) {
-    for (int i=1; i < argc; i++) {
-        int number = atoi(args[i]);
-        t_vector.push_back(number); // vektöre ekleme
-        t_deque.push_back(number);  // deque ekleme
-    }
 }
 
 void PmergeMe::sort_elements_in_vector(std::vector<int>& array) {

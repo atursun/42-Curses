@@ -27,7 +27,8 @@ Belirli bir tarihte belirli miktardaki Bitcoin’in değerini hesaplayan bir pro
 Program, iki veri kaynağı kullanacak:
 - Verilen CSV dosyası → Bitcoin fiyatlarını tarih bazında içerir (örnek: data.csv).
 - Kullanıcı girdisi dosyası → Değerlendirilecek tarih ve miktarları içerir (örnek: input.txt).
-Program, her giriş satırındaki Bitcoin miktarını o tarihe (veya en yakın önceki tarihe) ait fiyatla çarparak sonucu ekrana yazacak.
+Program, her giriş satırındaki Bitcoin miktarını 
+o tarihe (veya en yakın önceki tarihe) ait fiyatla çarparak sonucu ekrana yazacak.
 
 Program bir dosya argümanı almalı:
     - ./btc input.txt/csv

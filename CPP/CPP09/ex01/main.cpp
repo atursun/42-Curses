@@ -1,11 +1,6 @@
 
 #include "RPN.hpp"
 
-/*
-1. argümanın sayı olup olmadığını kontrol edeceksin (+ - / * (hariç))
-2. sayılar 10'nun üzerinde olmayacak (10 da olmayacak) (0-9)
-*/
-
 int main(int argc, char **argv) {
     if (argc == 2) {
         RPN rpn;
@@ -34,11 +29,13 @@ Error
 $>
 
 ex01: Reverse Polish Notation (RPN)
-Reverse Polish Notation (Ters Lehçe Gösterimi) kullanarak verilen bir matematiksel ifadeyi hesaplayan bir C++ programı yazmak.
+Reverse Polish Notation (RPN) yani Ters Lehçe Gösterimi, matematiksel ifadelerin operatörün sondan yazıldığı bir gösterim şeklidir.
+normal: 3 + 4
+RPN: 3 4 +
+Yani, önce sayılar sonra operatörler gelir.
 
-Mantığı:
-Normal matematikte: 3 + 4
-RPN'de: 3 4 +
+amacı, verilen RPN değeri hesaplayan bir program yazmamızı istemesidir.
+
 
 - Operatörler (+ - * /) her zaman sonradan gelir
 - Parantez yok

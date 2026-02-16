@@ -49,7 +49,6 @@ Girdi Kuralları
     - Negatif sayı (-1)
     - Sayı olmayan argüman (abc)
     - Boş argüman
-- Duplicate (aynı sayıdan iki tane) kontrolü zorunlu değil, sana bırakılmış.
 
 
 Kullanılması zorunlu STL container’lar
@@ -78,5 +77,5 @@ Ekran çıktısı (Output formatı)
 ÖZETLE
 Komut satırından gelen pozitif sayıları, Ford-Johnson algoritmasıyla, 
 en az iki farklı STL container kullanarak sıralayan ve performanslarını 
-karşılaştıran bir C++ programı yazman isteniyor.
+karşılaştıran bir program yazman isteniyor.
 */
