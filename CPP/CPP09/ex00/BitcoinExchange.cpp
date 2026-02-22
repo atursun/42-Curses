@@ -11,44 +11,28 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange& other) {
 BitcoinExchange::~BitcoinExchange() {}
 
 
-/*
-bu fonksyonu ile data.csv dosyasındaki verileri parsladım
-date ve rate olmak üzere map veri yapısına ekledim
-*/
 void BitcoinExchange::add_database(std::string filename) {
-    std::ifstream file(filename.c_str());   // ifstream const kabul ettiği için c_str() yaptım
+    std::ifstream file(filename.c_str()); 
     if (file.is_open() == true) {
         std::string line;
         while (std::getline(file, line)) {
             size_t comma_idx = line.find(',', 0);
-            if (comma_idx == std::string::npos) {   // npos: no posotion (böyle bir karakter yok anlamına geliyr)
+            if (comma_idx == std::string::npos) { 
                 std::cout << "Error: bad input => " << line << std::endl;
                 continue;
             }
             std::string date = line.substr(0, comma_idx);
             std::string exrt = line.substr(comma_idx + 1);
-            my_map[date] = atof(exrt.c_str());  // str -> double/float   (hatalı stringleri 0 olarak döndürür.)
-
-        // örnek mape eklenen verileri iterator ile yazdırma
-        // std::cout << "size: " << my_map.size() << std::endl;
-        // if (atof(exrt.c_str()) == 0) {
-        //     for (std::map<std::string, double>::iterator it = my_map.begin(); it != my_map.end(); it++)
-        //         std::cout << it->first << ": " << it->second << std::endl;
-        // }
+            my_map[date] = atof(exrt.c_str());
         }
     }
     else
         throw std::runtime_error("Error: could not open file.");
 }
 
-/*
-Verilen bir tarih string’i YYYY-MM-DD formatında mı ve mantıksal olarak geçerli mi?
-Geçerliyse 0, geçersizse 1 döndürür.
-*/
 int ctrl_date(std::string date) {
     int days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    // String’in başındaki ve sonundaki boşlukları (' ' ve '\t') bulur ve temizler
     size_t st = date.find_first_not_of(" \t");
     size_t en = date.find_last_not_of(" \t");
     if (st == std::string::npos)
@@ -71,25 +55,24 @@ int ctrl_date(std::string date) {
 }
 
 void BitcoinExchange::process_input(std::string input_file) {
-    std::ifstream file(input_file.c_str());   // ifstream const kabul ettiği iççin c_str() yaptım
+    std::ifstream file(input_file.c_str());
     if (file.is_open() == true) {
         std::string line;
         while (std::getline(file, line)) {
-            size_t pipe_idx = line.find('|', 0);   // hata durumlarını ele (mesela yoksa)
+            size_t pipe_idx = line.find('|', 0);
             if (pipe_idx == std::string::npos) {
                 std::cout << "Error: bad input => " << line << std::endl;
                 continue;
             }
-            // tarih ve değeri (bitcoin adedini) ayırma (string olarak)
             std::string date = line.substr(0, pipe_idx);
             std::string value_str = line.substr(pipe_idx + 1);
-            if (!strncmp(date.c_str(), "date ", 5) && !strncmp(value_str.c_str(), " value", 6)) // ilk satır ise
+            if (!strncmp(date.c_str(), "date ", 5) && !strncmp(value_str.c_str(), " value", 6))
                 continue;
             if (ctrl_date(date)) {
                 std::cout << "Error: bad date input" << " => " << date << std::endl;
                 continue;
             }
-            try {
+            try {                
                 double value = atof(value_str.c_str());
                 double final_result = 0;
 
@@ -98,19 +81,12 @@ void BitcoinExchange::process_input(std::string input_file) {
                 if (value > 1000)
                     throw std::runtime_error("Error: too large a number.");
 
-                /*
-                “Bu tarih yoksa, ondan küçük olan EN YAKIN tarihi bul”
-                lower_bound() -> date’ten küçük olmayan (>= date) ilk tarihi bulur
-                - it == my_map.end() -> lower_bound(date) map’te uygun bir tarih BULAMADI
-                - it->first != date -> lower_bound bir tarih buldu AMA bu tarih input ile birebir aynı değil
-                */
-                std::map<std::string, double>::const_iterator it = my_map.lower_bound(date); // const_iterator: Sadece okuma
-                if (it == my_map.end() || it->first != date) {   // ikisinde de exact tarih yoksa giriyor
-                    if (it == my_map.begin())    // “Bir önceki tarihe gidebilir miyim?” diyor (gidemez çünkü it begin() eşit en eski tarihten önce daha eski bir tarih yok<)
+                std::map<std::string, double>::const_iterator it = my_map.lower_bound(date);
+                if (it == my_map.end() || it->first != date) {
+                    if (it == my_map.begin())
                         throw std::runtime_error("Error: date too old.");
-                    --it;   // Bir önceki tarihi kullan (en yakın geçmiş tarih)
+                    --it;
                 }
-                // bitcoin miktarını (value), o tarihteki bitcoin fiyatıyla çarpıyor.
                 final_result = it->second * value;
                 std::cout << date << "=> " << value << " = " << final_result << std::endl;
             }

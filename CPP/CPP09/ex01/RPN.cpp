@@ -11,7 +11,6 @@ RPN &RPN::operator=(const RPN& other) {
 RPN::~RPN() {}
 
 
-
 bool RPN::operations(char ops) {
     return (ops == '+' || ops == '-' || ops == '*' || ops == '/');
 }
