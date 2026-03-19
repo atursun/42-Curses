@@ -1,6 +1,6 @@
 # 42 Ecole
 
-This repository contains my progress, projects, and exercises from the **42 Cursus**.
+This repository contains my progress and projects from the **42 Cursus**.
 
 ## What is 42 Ecole?
 
