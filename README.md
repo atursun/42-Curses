@@ -1,7 +1,7 @@
 # 42 Ecole
 
 This repository contains my progress and projects from the **42 Cursus**.
-NOT: SysAdmin'de gelişmek için, Netpractice && Born2beroot tekrardan yapılacak ve submodule olarak oluşturulacaktır.
+- NOT: SysAdmin'de gelişmek için, Netpractice && Born2beroot tekrardan yapılacak ve submodule olarak oluşturulacaktır.
 
 ## What is 42 Ecole?
 
