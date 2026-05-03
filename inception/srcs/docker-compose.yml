@@ -1,0 +1,84 @@
+services:
+  mariadb:
+    build: ./requirements/mariadb   # Dizindeki dockerfile'dan image build ediyorsun (build: docker build komutunun yerini alıyor)
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    networks:                     # networks: kısmı docker network create inception_network komutunun yerini alıyor.
+      - inception
+    expose:                       # Sadece internal erişim. dışarıdan erişmezsin.
+      - "3306"
+    volumes:                      # volumes: kısmı "docker volume create" komutlarının yerini alıyor.
+      - mariadb:/var/lib/mysql
+    env_file:
+      - .env
+  wordpress:
+    build: ./requirements/wordpress
+    image: wordpress
+    container_name: wordpress
+    restart: always
+    networks:
+      - inception
+    expose:
+      - "9000"
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - mariadb       # DB önce başlayacak demek. 
+    env_file:
+      - .env
+  nginx:
+    build: ./requirements/nginx
+    image: nginx
+    container_name: nginx
+    restart: always
+    networks:
+      - inception
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/html   # wordpress servisinin Aynı volume, Nginx WordPress dosyalarını okuyabilir
+  adminer:
+    build: ./requirements/bonus/adminer   # Dizindeki dockerfile'dan image build ediyorsun
+    image: adminer
+    container_name: adminer
+    restart: always
+    networks:
+      - inception
+    expose:
+      - "85"
+  static-website:
+    build: ./requirements/bonus/static-website   # Dizindeki dockerfile'dan image build ediyorsun
+    image: static-website
+    container_name: static-website
+    restart: always
+    networks:
+      - inception
+    expose:
+      - "80"
+  uptime:
+    build: ./requirements/bonus/uptime
+    image: uptime
+    container_name: uptime
+    restart: always
+    networks:
+      - inception
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime:/app/data
+
+networks:
+  inception:
+    driver: bridge
+
+volumes:
+  wordpress:
+  mariadb:
+  uptime:
+
+
+# expose → sadece container içi
+# ports → dış dünyaya açık
