@@ -85,7 +85,6 @@ This ensures compose always uses the correct file and env context.
 
 - `wordpress` -> mounted at `/var/www/html`
 - `mariadb` -> mounted at `/var/lib/mysql`
-- `uptime` -> mounted at `/app/data`
 
 These named volumes persist data across container recreation.
 
@@ -102,7 +101,6 @@ where `<LOGIN>` is parsed from `srcs/.env`.
 ### `nginx`
 - Public HTTPS entrypoint (`443`)
 - Forwards PHP requests to `wordpress:9000`
-- Handles bonus route proxies (`/adminer`, `/static-website`)
 
 ### `wordpress`
 - php-fpm runs on port `9000`
@@ -121,7 +119,6 @@ where `<LOGIN>` is parsed from `srcs/.env`.
 - Verify URLs:
   - `https://atursun.42.fr`
   - `https://atursun.42.fr/wp-admin`
-  - `https://atursun.42.fr/adminer`
 - Inspect logs with `make logs`
 
 ## 7) Troubleshooting

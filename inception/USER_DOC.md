@@ -9,11 +9,6 @@ Mandatory services:
 - `wordpress` (website + admin panel)
 - `mariadb` (database backend)
 
-Bonus services in this repository:
-- `adminer` (database web UI)
-- `static-website` (static content route)
-- `uptime` (service monitoring dashboard)
-
 ## 2) Start and Stop the Project
 
 From repository root:
@@ -39,9 +34,6 @@ Make sure your hosts file maps the domain (example):
 Then access:
 - Website: `https://atursun.42.fr`
 - WordPress admin panel: `https://atursun.42.fr/wp-admin`
-- Adminer: `https://atursun.42.fr/adminer`
-- Static website: `https://atursun.42.fr/static-website`
-- Uptime dashboard: `http://atursun.42.fr:3001`
 
 Note: the TLS certificate is self-signed in this setup, so browser warnings are expected.
 
@@ -54,11 +46,6 @@ Important values:
 - WordPress admin: `WP_ADMIN_USER`, `WP_ADMIN_PASS`, `WP_ADMIN_EMAIL`
 - WordPress user: `WP_USER`, `WP_USER_PASS`, `WP_USER_EMAIL`
 - MariaDB: `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`
-
-Adminer login tips:
-- System: `MySQL`
-- Server: `mariadb`
-- Username/password: values from `.env`
 
 Security note:
 - Keep `.env` private.
@@ -75,8 +62,6 @@ Security note:
 
 - Open website URL and verify homepage loads
 - Log in to `/wp-admin`
-- Open `/adminer` and verify DB connection
-- Open Uptime dashboard and confirm service states
 
 ### If something fails
 
@@ -90,7 +75,5 @@ Security note:
   - Usually WordPress/php-fpm is not reachable from NGINX.
 - WordPress login fails
   - Re-check `WP_ADMIN_*` values in `.env`.
-- Adminer cannot connect
-  - Use `mariadb` as server host, not `localhost`.
 - Domain does not open
   - Verify hosts file mapping and HTTPS URL.

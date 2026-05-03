@@ -1,4 +1,3 @@
-# inception (9 nisanda projeye başlandı)
 
 # Proje Bittikten Sonra Ne Yapmış Oluyorum ?
 Bu projede, bir sanal makine üzerinde Docker kullanarak çalışan bir web altyapısı kurmuş olacaksın.
@@ -7,9 +6,6 @@ Sistemi HTTPS (TLS) ile güvenli hale getirip tek giriş noktası oluşturmuş o
 Verileri volume kullanarak kalıcı hale getirmiş ve servisleri otomatik yönetilebilir yapmış olacaksın.
 Sonuç olarak, gerçek hayattaki bir web sunucu altyapısını sıfırdan kurmayı öğrenmiş olacaksın.
 "Ben sadece bir web sitesi kurmadım, o web sitesini çalıştıran tüm sistemi kurdum"
-
-
-
 
 
 
@@ -24,172 +20,25 @@ root password -> 2332
 username -> apo | şifresi -> 233
 
 
-# ----Subject---
-
-######
+# ----Subject diagram---
 - Sonuç: Subjec'teki diyagram Docker kullanılarak kurulmuş bir WordPress web sitesinin mimarisini adım adım gösteriyor.
 
-Bu diyagram **Docker kullanılarak kurulmuş bir WordPress web sitesinin mimarisini** adım adım gösteriyor. Baştan sona, dış dünyadan (internet) verinin nasıl gelip WordPress’in nasıl çalıştığını çok net şekilde açıklayayım.
+Bu yapı, **Docker içinde çalışan bir WordPress sitesinin sistem mimarisidir.** Ana bilgisayar (host) üzerinde Docker çalışır ve içinde üç ayrı container bulunur: **NGINX, WordPress (PHP), MariaDB**. Bu container’lar birbirinden izole çalışır ama aynı Docker ağı içinde birbirleriyle haberleşir.
 
----
+Kullanıcı tarayıcıdan siteye girdiğinde istek internet üzerinden **443 portuyla (HTTPS)** önce **NGINX** container’ına gelir. NGINX burada dış dünyaya açılan kapıdır. Gelen isteği karşılar, statik dosyaları (resim, CSS, JS) kendisi sunar. Eğer istek WordPress sayfasıysa bunu **9000 portu üzerinden WordPress + PHP-FPM** container’ına iletir.
 
-## 🖥️ 1. Computer HOST (Ana Makine)
+WordPress container’ı sitenin asıl beynidir. Yazılar, sayfalar, kullanıcı girişleri, eklentiler ve tüm site mantığı burada çalışır. Eğer veri gerekiyorsa **3306 portu üzerinden MariaDB veritabanına bağlanır.** Veritabanından yazıları, ayarları veya kullanıcı bilgilerini çeker. Sonra HTML sayfayı oluşturur ve tekrar NGINX’e gönderir. NGINX de bunu ziyaretçiye gösterir.
 
-En dış çerçevede gördüğün **Computer HOST**, senin gerçek sunucun ya da bilgisayarın:
+MariaDB container’ı sitenin hafızasıdır. İçinde yazılar, kullanıcı hesapları, şifreler, yorumlar ve ayarlar tutulur. Dışarıdan internete açık değildir; sadece WordPress erişebilir. Bu da güvenlik sağlar.
 
-* Fiziksel makine veya VPS
-* Docker burada çalışıyor
-* Tüm container’lar bu makinenin içinde
+Ayrıca sistemde **Volumes (kalıcı depolama)** bulunur. Bunlar sayesinde container silinse bile veriler kaybolmaz. Veritabanı verileri ayrı volume’da tutulur. WordPress tema, eklenti ve yüklenen resimler de başka bir volume’da saklanır.
 
-> Yani Docker, bu host üzerinde izole mini sistemler (container’lar) çalıştırıyor.
+Kısaca:
 
----
+* **NGINX = Kapı / Trafik yöneticisi**
+* **WordPress = Beyin / Siteyi oluşturan sistem**
+* **MariaDB = Hafıza / Verileri saklayan yer**
+* **Docker Network = İç iletişim ağı**
+* **Volumes = Kalıcı disk alanı**
 
-## 🌐 2. WWW (İnternet) → NGINX (443)
-
-En üstte **WWW** var:
-
-* Kullanıcı tarayıcıdan siteye giriyor
-  👉 `https://siteadi.com`
-
-Bu istek:
-
-* **443 portu** üzerinden geliyor (HTTPS)
-
-⬇️
-Bu istek doğrudan **NGINX container**’ına ulaşıyor.
-
-> 🔒 443 = HTTPS
-> NGINX burada **kapı görevlisi (reverse proxy)** gibi çalışıyor.
-
----
-
-## 📦 3. Docker Network (Özel İç Ağ)
-
-Gri alanın tamamı **Docker network**:
-
-* Container’lar **aynı özel ağ içinde**
-* Dışarıdan doğrudan erişilemezler
-* Birbirleriyle **container isimleri üzerinden** haberleşirler
-
-Bu ağ içinde 3 ana container var:
-
----
-
-## 🧱 4. Container NGINX (Web Server)
-
-**Görevi:**
-
-* İnternetten gelen istekleri almak
-* HTML, CSS, JS gibi statik dosyaları sunmak
-* PHP isteklerini WordPress-PHP container’ına yönlendirmek
-
-**Bağlantı:**
-
-* WordPress-PHP ile **9000 portu** üzerinden konuşur
-
-```text
-NGINX ──(9000)──> WordPress + PHP-FPM
-```
-
-> NGINX PHP çalıştırmaz, sadece yönlendirir.
-
----
-
-## 🐘 5. Container WordPress + PHP
-
-**Görevi:**
-
-* WordPress’in kendisi burada
-* PHP kodları burada çalışır
-* Kullanıcının istediği sayfayı oluşturur
-
-**İki yönlü bağlantısı var:**
-
-### 🔁 NGINX ile:
-
-* PHP isteklerini alır
-* HTML çıktısını NGINX’e geri gönderir
-
-### 🔁 DB ile:
-
-* Yazılar, kullanıcılar, ayarlar için veritabanına bağlanır
-* **3306 portu** kullanılır
-
-```text
-WordPress ──(3306)──> Database
-```
-
----
-
-## 🗄️ 6. Container DB (Veritabanı – MySQL/MariaDB)
-
-**Görevi:**
-
-* WordPress verilerini saklar:
-
-  * Yazılar
-  * Kullanıcılar
-  * Şifreler
-  * Ayarlar
-
-**Önemli nokta:**
-
-* Dış dünyaya açık **DEĞİL**
-* Sadece WordPress container erişebilir
-
----
-
-## 💾 7. Volumes (Kalıcı Veri)
-
-Altta gördüğün silindirler **Volume**’leri temsil eder.
-
-### 📌 DB Volume
-
-* Veritabanı verileri burada tutulur
-* Container silinse bile:
-
-  * Yazılar
-  * Kullanıcılar
-    **kaybolmaz**
-
-### 📌 WordPress Volume
-
-* `wp-content` klasörü
-* Tema, eklenti, yüklenen görseller burada
-
-> Volume = **Docker container ölse bile veri yaşar**
-
----
-
-## 🔌 8. Portlar Ne Anlama Geliyor?
-
-| Port | Nerede            | Anlamı  |
-| ---- | ----------------- | ------- |
-| 443  | WWW → NGINX       | HTTPS   |
-| 9000 | NGINX → WordPress | PHP-FPM |
-| 3306 | WordPress → DB    | MySQL   |
-
----
-
-## 🔄 9. Bir Kullanıcı Siteye Girdiğinde Ne Olur?
-
-1. Tarayıcı → `https://site.com`
-2. İstek **443** ile NGINX’e gelir
-3. NGINX:
-
-   * Statik dosya ise kendisi verir
-   * PHP ise WordPress’e yollar
-4. WordPress:
-
-   * Gerekirse DB’den veri çeker
-   * Sayfayı oluşturur
-5. HTML çıktı:
-
-   * WordPress → NGINX → Kullanıcı
-
----
-
-## 🎯 Diyagramın Özeti (Tek Cümle)
-
-> Bu mimaride **NGINX dış dünyaya açılan kapı**, **WordPress beynin kendisi**, **Database hafıza**, **Docker network özel iç yol**, **Volume ise kalıcı depodur**.
+Yani bu yapı hızlı, güvenli, düzenli ve taşınabilir bir WordPress sunucu sistemidir.

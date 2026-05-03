@@ -84,8 +84,3 @@ TLS (Transport Layer Security) — eski adıyla SSL — istemci (tarayıcı) ile
 
 
 15. git rm --cached <dosya> -> uzak repodaki bir dosyası siler. sonra localde commit yapıp push yapman gerekiyor.
-
-
-
-
-

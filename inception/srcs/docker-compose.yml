@@ -40,35 +40,6 @@ services:
       - wordpress
     volumes:
       - wordpress:/var/www/html   # wordpress servisinin Aynı volume, Nginx WordPress dosyalarını okuyabilir
-  adminer:
-    build: ./requirements/bonus/adminer   # Dizindeki dockerfile'dan image build ediyorsun
-    image: adminer
-    container_name: adminer
-    restart: always
-    networks:
-      - inception
-    expose:
-      - "85"
-  static-website:
-    build: ./requirements/bonus/static-website   # Dizindeki dockerfile'dan image build ediyorsun
-    image: static-website
-    container_name: static-website
-    restart: always
-    networks:
-      - inception
-    expose:
-      - "80"
-  uptime:
-    build: ./requirements/bonus/uptime
-    image: uptime
-    container_name: uptime
-    restart: always
-    networks:
-      - inception
-    ports:
-      - "3001:3001"
-    volumes:
-      - uptime:/app/data
 
 networks:
   inception:
@@ -77,7 +48,6 @@ networks:
 volumes:
   wordpress:
   mariadb:
-  uptime:
 
 
 # expose → sadece container içi

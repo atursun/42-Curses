@@ -10,11 +10,6 @@ It provides a secure WordPress setup with:
 - `wordpress` + `p>hp-fpm` (application layer)
 - `mariadb` (database layer)
 
-Bonus services currently included in this repository:
-- `adminer`
-- `static-website`
-- `uptime` (Uptime Kuma)
-
 The goal is to design a realistic, modular, and persistent web infrastructure where each service runs in its own container, communicates over a dedicated Docker network, and keeps data across restarts via volumes.
 
 ### Project Purpose (Core Architecture)
@@ -48,7 +43,6 @@ Main implementation sources:
 - `srcs/requirements/nginx/*`
 - `srcs/requirements/wordpress/*`
 - `srcs/requirements/mariadb/*`
-- `srcs/requirements/bonus/*`
 - `Makefile`
 
 ### Main design choices
@@ -112,9 +106,6 @@ From repository root:
 
 - WordPress: `https://atursun.42.fr`
 - WordPress admin: `https://atursun.42.fr/wp-admin`
-- Adminer: `https://atursun.42.fr/adminer`
-- Static website: `https://atursun.42.fr/static-website`
-- Uptime Kuma: `http://atursun.42.fr:3001`
 
 ## Additional Information
 

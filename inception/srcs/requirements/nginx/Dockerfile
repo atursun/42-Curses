@@ -8,7 +8,6 @@
 #   1. HTTPS (SSL/TLS) trafiğini 443 portunda dinler
 #   2. Statik dosyaları (CSS, JS, resim) doğrudan sunar
 #   3. Dinamik PHP isteklerini wordpress:9000'e (PHP-FPM) yönlendirir
-#   4. Bonus hizmetlerine route proxy'si yapar (/adminer, /static-website)
 # 
 # SSL Sertifikası: Self-signed sertifika otomatik oluşturulur (365 gün geçerli).
 #                  atursun.42.fr alan adı için özel olarak üretilir.
