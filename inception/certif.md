@@ -1,5 +1,6 @@
-Bir domaine istek attığımda, site (Nginx) tarayıcıya bir SSL/TLS sertifikası sunar. Tarayıcı bu sertifikanın geçerliliğini ve hangi kurum tarafından imzalandığını kontrol eder. Eğer sertifika, tarayıcının güvenilir kabul ettiği bir Certificate Authority (CA) tarafından imzalanmamışsa “güvenilir değil” uyarısı gösterir. https://atursun.42.fr adresinde bu uyarıyı görmemin temel nedeni, sertifikanın self-signed olmasıdır.
+- Bir domaine istek attığımda, site (Nginx) tarayıcıya bir SSL/TLS sertifikası sunar. Tarayıcı bu sertifikanın geçerliliğini ve hangi kurum tarafından imzalandığını kontrol eder. Eğer sertifika, tarayıcının güvenilir kabul ettiği bir Certificate Authority (CA) tarafından imzalanmamışsa “güvenilir değil” uyarısı gösterir. https://atursun.42.fr adresinde bu uyarıyı görmemin temel nedeni, sertifikanın self-signed olmasıdır.
 
+- domaine istek attığımda bana "güvenilir değil" diye bir yazı çıkarıyor firefox. bunun sebebi ise sertifikanın self-signed (kendi kendine) imzalanmış olmasıdır. eğer "güvenilir değil" hatası almak istemiyorsak, CA (Certificate Authority) sertifika otoritesi tarafından sertifikayı imzalatmamız gerekiyor (yani, bu domainin benim olduğunu doğrulamam gerekiyor. bu domain gerçekten de benim kontrolüm de mi). örnek otorite (lets encrypt)
 
 
 # NGINX

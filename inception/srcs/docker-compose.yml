@@ -52,3 +52,12 @@ volumes:
 
 # expose → sadece container içi
 # ports → dış dünyaya açık
+# driver: bridge, 
+# Docker’da kullanılan network türünü belirtir ve en temel anlamıyla container’ların aynı özel ağ içinde birbirleriyle iletişim kurmasını sağlayan sanal ağ yapısıdır.
+# bridge driver = container’lar için oluşturulan izole “yerel ağ (LAN)”
+
+# Nasıl çalışır?
+# -Docker içinde:
+# # Docker bir sanal switch (köprü) oluşturur
+# # Container’lar bu switch’e bağlanır
+# # Aynı network içindeki container’lar birbirini görür

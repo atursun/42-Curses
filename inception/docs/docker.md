@@ -1,9 +1,4 @@
 # Yönetici Özeti (Container - Docker)
-Bu rapor konteyner teknolojisini ve Docker ekosistemini kapsamlı şekilde ele almaktadır. Öncelikle konteyner kavramı tanımlanmış, tarihçe ve VM’lerden farklarına (kaynak kullanımı, izolasyon, performans) değinilmiştir. Ardından konteynerlerin Linux çekirdeği düzeyinde nasıl çalıştığı açıklanmıştır: Namespaces, cgroups, chroot, OverlayFS/union dosya sistemleri ve konteyner imaj katman yapısı irdelenmiştir. Open Container Initiative (OCI) standartları ve konteyner yürütücüleri (runc, containerd) özetlenmiştir. Docker’ın mimarisi (daemon, CLI, registry) ve Dockerfile ile imaj oluşturma süreci anlatılmıştır; imaj ve konteyner arasındaki fark vurgulanmıştır. 
-
-Sonrasında Docker CLI komutları kategorilere ayrılarak incelenmiştir: **image**, **container**, **network**, **volume**, **system**, **swarm** ve **compose** komutları tablo halinde özetlenmiş; her bir komutun sözdizimi, seçenekleri ve kullanım örnekleri ile birlikte tipik hatalar ve çözümleri verilmiştir. Örnek Dockerfile ve *docker-compose.yml* dosyaları, çok aşamalı (multi-stage) yapılandırma, ağ ve hacim (volume) örnekleri, günlükleme (logs) ve hata ayıklama yöntemleri sunulmuştur. 
-
-Son olarak konteyner güvenliği, performans optimizasyonu, kaynak kısıtlama ve en iyi uygulamalar ele alınmıştır. Çekirdek güvenlik özellikleri (namespaces, cgroups), Docker’ın varsayılan saldırı yüzeyi, en az ayrıcalık prensibi gibi konular işlenmiş; küçük temel imajlar, çok aşamalı derlemeler, `.dockerignore` kullanımı gibi performans ve boyut optimizasyon teknikleri üzerinde durulmuştur. Çıktıda gerçek komut ve kod blokları, mermaid diyagramlar ve bir sorun çözümü vaka çalışması örneği bulunmaktadır.
 
 ## Tanım ve Tarihçe
 
@@ -28,34 +23,14 @@ Konteyner fikrinin kökleri 1979’da Unix V7’de *chroot* çağrısının geti
 
 **Konteyner–Sanal Makine Karşılaştırması:** VM’ler her biri tam bir işletim sistemine sahip konuk makineler olup donanım seviyesinde sanallaştırma yapar; çekirdek dahil tüm yazılımı çalıştırdıkları için kaynak kullanımı yüksektir. Konteynerler ise ortak çekirdeği paylaşır, yalnızca uygulamanın gereksinimlerini barındıran dosya sistem katmanları ile paketlenir. Bu sebeple sanal makineler genellikle “*Kaynak Yoğun*” iken, konteynerler daha hafif ve taşınabilirdir. Örneğin bir konteyner genellikle **MB** büyüklüğündeyken, VM birkaç **GB** olabilmektedir; konteynerlerin başlama süresi saniyelerle ölçülürken VM’lerin başlatılması dakikaları bulabilir. VM’ler donanım seviyesinde izolasyon sağladığından güvenlik/düzenleme açısından avantajlı olabilir, ancak konteynerler ise yüksek yoğunluk, taşınabilirlik ve hızlı dağıtım gerektiren modern uygulamalar için tercih edilir.
 
-## Teknik Çalışma Prensibi  
-Konteynerlerin “kapsül” mantığı aslında Linux çekirdeğinin sunduğu izolasyon mekanizmalarına dayalıdır. Docker veya Podman gibi bir konteyner motoru, çekirdeğin sağladığı bu özellikleri bir araya getirerek kullanım kolaylığı sunar. Temel bileşenler şunlardır:
+## Docker-Container Karşılaştırılması
+- Docker, uygulamaları izole ortamlarda çalıştırmak ve yönetmek için kullanılan bir teknolojidir.
+- container ise, uygulamanın kendisi, izole edilmiş bir çalışma alanı, aktif olarak çalışan bir süreç/paket.
 
-- **Çekirdek Namespaces (Ad Uzayları):** Farklı ad alanları sayesinde her konteyner kendi işlem ağacını, kullanıcı kimliklerini, IPC (süreçler arası iletişim) nesnelerini, dağıtım noktalarını, ağ yığınını vb. izole eder. Örneğin ağ isim alanı (network namespace) her konteynere kendine ait sanal ağ arabirimi sağlar. Bu sayede bir konteyner içindeki süreçler, başka bir konteynerdeki süreçleri veya host işlemleri göremez. Docker çalıştırma komutu çağrıldığında arka planda ilgili ad alanları otomatik oluşturulur. Çekirdek geliştiricileri *‘konteyner’* gibi tek bir yapıyı çekirdek seviyesinde tanımlamak yerine, bu çeşitli teknolojileri (namespaces, SELinux etiketi vb.) serbestçe birleştirerek izolasyon sağlar. Grafik olarak:
+Docker’dan önce container teknolojisi (örneğin LXC) vardı ancak kullanımı karmaşıktı çünkü geliştiriciler kernel seviyesindeki detaylarla (namespace, cgroups vb.) uğraşmak zorundaydı.
+Docker bu karmaşıklığı gizleyerek container oluşturma ve yönetmeyi basitleştirdi. Dockerfile sayesinde uygulama ve tüm bağımlılıkları kolayca tanımlanıp her ortamda aynı şekilde çalıştırılabilir hale geldi.
+Sonuç olarak, container teknolojisi önceden vardı ama kullanımı zordu; Docker bu süreci standartlaştırıp kolaylaştırarak yaygın hale getirdi.
 
-```mermaid
-flowchart LR
-    subgraph Docker_Client_Server
-      CLI["Docker CLI (docker)"] --> Daemon["Docker Daemon (dockerd)"]
-      Daemon -->|API Request| Containerd["containerd"]
-      Containerd --> Runc["runc (OCI runtime)"]
-      Runc --> Kernel["Linux Kernel"]
-      Kernel --> Namespaces["Namespaces & Cgroups"]
-      Namespaces --> ContainerProcess["Container İşlemleri"]
-    end
-```
-
-- **Cgroups (Kontrol Grupları):** Bu çekirdek özelliği süreçlerin kaynak tüketimini sınırlar ve izler. Cgroups sayesinde her konteynerin kullanabileceği CPU süresi, bellek, disk I/O, ağ bant genişliği vb. kısıtlanabilir. Örneğin `--memory` veya `--cpus` bayrakları ile konteynere hard bellek veya CPU sınırı koyulur. Bu, bir konteynerin tek başına tüm sisteme bellek açlığı saldırısı (DoS) gerçekleştirmesini önler. Cgroups aynı zamanda kaynak kullanımını raporlar ve birden çok süreç gruplanarak yönetilebilir (örn. `docker stats` çıktısında her konteynerin kullandığı miktarı görürüz). Docker’da bir konteyner motoru çalıştırıldığında otomatik olarak bir cgroup hiyerarşisi oluşturulur ve içerideki işlemlere bu sınırlamalar uygulanır.
-
-- **Chroot (Dosya Sistemi Köklendirme):** En eski izole etme tekniği olan chroot, bir işlemin kök dizinini değiştirmesine izin vererek dosya sistemi düzeyinde sınırlama sağlar. Unix V7’de 1979’da tanıtılan bu mekanizma, bir işlemi kendi alt dizinine “hapsetmek” suretiyle temel izolasyon sunmuştur. Modern konteynerler chroot’un ötesinde üst üste bindirilmiş dosya sistemleri (overlay) kullanır, ancak mantık olarak chroot izolasyonun başlangıcı sayılır.
-
-- **OverlayFS (Union Dosya Sistemi):** Konteyner imajlarındaki katmanlı yapı burada devreye girer. OverlayFS, Linux çekirdeğindeki bir birleşim (union) dosya sistemidir ve birden fazla dizini tek bir görünümde birleştirir. Docker’da her imaj katmanı, altındaki katmana eklenen/değiştirilen dosyaları içerir. Overlay2 sürücüsü ile bir konteyner diski, çoğu zaman *alt* (`lowerdir`) ve *üst* (`upperdir`) olarak iki dizinin birleştirilmiş görünümünden (`merged`) oluşur. Örneğin bir `ubuntu` imajında katmanlar, dosya sisteminde diske alınarak bir *overlay* dosya sistemi oluşturulur. OverlayFS’nin avantajı, ayrı katmanların ortak dosyaları tekrar etmeden paylaşılmasına izin vererek depolama verimliliği ve hızlı imaj oluşturma sağlar. Docker Engine 29 ve sonrası containerd tabanlı snapshotter ile çalışır; önceki sürümlerde kullanılan `overlay2` sürücüsü Docker tarafından sağlanan bir overlay uygulamasıdır.
-
-- **Konteyner İmaj Katmanları:** Her Docker imajı ardışık katmanlardan oluşur; her katman belirli dosya ekleme, silme veya değiştirme işlemlerini tutar. Bir imaj immutable (değiştirilemez) olarak paketlenir; yeni özellik eklemek için mevcut imaja bir katman daha eklenir. Örneğin bir `node:14` imajını temel alıp uygulama kodunu eklemek, yeni bir katman oluşturur. Katman bazlı yapı, ortak alt katmanların yeniden kullanımı sayesinde disk tasarrufu ve inşa hız kazancı sağlar.
-
-- **Çalıştırma Zamanı (Runtime):** Docker, konteynerleri yürütmek için OCI (Open Container Initiative) standartlarına uyumlu bir runtime kullanır. Docker’ın açık kaynak referans runtime’ı **runc**’dır; bu, OCI runtime-spec ile uyumlu basit bir konteyner çalıştırıcısıdır. Docker Engine, konteynerleri başlatırken önce `containerd` adlı bir aracı servisi kullanır. Containerd, konteyner yaşam döngüsünü denetler (imaj indirme/yöneticisi, içerik depolama, network vb.), ve nihayetinde runc’u çağırarak çekirdek çağrılarını yapar. Böylece Docker’ın CLI’sından gelen `docker run` gibi bir komut, daemon → containerd → runc zinciri ile çekirdekte süreç başlatılmasıyla sonuçlanır. 
-
-- **OCI Standartları:** Docker ve diğer araçlar arasında uyumluluğu sağlamak için OCI organizasyonu konteyner imaj ve runtime spesifikasyonları geliştirmiştir. OCI İmaj Spesifikasyonu, imajların disk üzerinde nasıl dizinlendiğini tanımlar. OCI Runtime Spec ise açılmış bir imajı çalıştırmak için gerekli *bundle* yapılandırmasını belirler. Bir OCI uyumlu runtime (örn. runc), indirilen bir imajı açıp dosya sistemini konteyner kök dizinine monte eder ve belirtilen komutları çalıştırır. Buna ek olarak, OCI Distribution Spec konteyner kayıt defterleri için HTTP API standartlarını belirler; böylece `docker pull/push` işlemleri tüm OCI kayıt defterleri arasında tutarlı biçimde yapılabilir. Docker, runc ve Docker Image v2 formatını OCI’ye bağışlayarak bu spesifikasyonların temelini oluşturmuştur.
 
 ## Docker Client && Engine (server)
 Docker, yukarıda açıklanan konteyner altyapısını kullanarak geliştirme ve dağıtım süreçlerini kolaylaştıran bir platformdur. Temel mantığı bir istemci-sunucu mimarisine dayanır:
@@ -300,6 +275,3 @@ Bu komut kullanıcınızı `docker` grubuna ekler. Ardından oturumu kapatıp te
 - **Kaynak Sınırlama:** Cgroups’un sunduğu bellek ve CPU limitlerini kullanarak her konteyner için kaynağı sınırlandırın. Örneğin `docker run -m 512m --cpus=1.5 ...` ile konteynerin en fazla 512MB bellek ve 1.5 CPU kullanması sağlanabilir. Bu, paylaşılan ortamda bir konteynerin diğerlerini etkilemesini önler.  OOM durumlarında Docker, daemon’u koruma önceliği yüksekte tutar. Yüksek iş yükü altında *CPU paylaşımını* ayarlamak için `--cpu-shares`, `--cpuset-cpus` gibi bayraklar kullanılabilir.
 
 - **Immutable Image Stratejileri:** İmajlar değişmez (immutable) yapıda tasarlanmalı ve sürüm kontrollü kaynaklardan üretilmelidir. “latest” etiketi yerine versiyonlu etiketler kullanın, böylece dağıtımda kararlılık sağlanır. Mümkün olduğunca konteyner içi yapılandırma yerine çevresel değişken (ENV), komut satırı veya gizli dosyalar (`docker secret`) ile ayarlanır, böylece imaj statik kalır. Otomasyon (CI/CD) ile her değişiklik kod deposundan yeni imaj üretilip dağıtılmalıdır; elle imaj güncellemekten kaçının. Ayrıca geniş bir saldırı yüzeyi oluşturabileceği için konteyner içine kritik altyapı yazılımı yüklemeyin; base imaj seçiminde güvenli, güncel imajlar tercih edin. Kısacası her imaj **kendini dokunulmaz kabul etmeli** ve yapılandırma/veri “dışarıda”, Docker’ın veri yönetimi özellikleriyle sağlanmalıdır.
-
-## Kaynaklar  
-Bu raporun içeriği öncelikle resmi Docker dokümantasyonundan (Docker Engine ve Docker Compose kılavuzları, güvenlik bölümleri), Open Container Initiative spesifikasyonlarından ve Linux çekirdek belgelerinden derlenmiştir. Ayrıca container teknolojisi üzerine Red Hat Developer dersleri ve NGINX blog yazısı gibi güvenilir kaynaklar referans alınmıştır. Türkçe kaynaklardan, kavramsal destek olarak Patika, PlusClouds gibi blog makaleleri incelenmiştir. 
