@@ -45,9 +45,23 @@ networks:
   inception:
     driver: bridge
 
+
 volumes:
   wordpress:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/atursun/data/wordpress
+
   mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/atursun/data/mariadb
 
 
 # expose → sadece container içi

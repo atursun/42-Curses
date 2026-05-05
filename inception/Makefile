@@ -1,20 +1,11 @@
-NAME        := inception
-SRC_DIR     := srcs
-COMPOSE_FILE:= $(SRC_DIR)/docker-compose.yml
-ENV_FILE    := $(SRC_DIR)/.env
-
-LOGIN       := $(shell sed -n 's/^LOGIN=//p' $(ENV_FILE))
-DATA_DIR    := /home/$(LOGIN)/data
-WP_DATA     := $(DATA_DIR)/wordpress
-DB_DATA     := $(DATA_DIR)/mariadb
-
-COMPOSE     := docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE)
+NAME	= inception
+COMPOSE	= docker compose -f srcs/docker-compose.yml --env-file srcs/.env
 
 
 all: up
 
 up: build
-	@mkdir -p $(WP_DATA) $(DB_DATA)
+	@mkdir -p /home/atursun/data/wordpress /home/atursun/data/mariadb
 	@$(COMPOSE) up -d
 
 build:
@@ -27,7 +18,7 @@ stop:
 	@$(COMPOSE) stop
 
 start:
-	@$(COMPOSE) start
+	@$(COMPOSE) up -d
 
 restart: down up
 

@@ -7,7 +7,7 @@
 `Inception` aims to build and manage a multi-service system using Docker, ensuring that all services run together seamlessly.
 It provides a secure WordPress setup with:
 - `nginx` (TLS entrypoint, reverse proxy)
-- `wordpress` + `p>hp-fpm` (application layer)
+- `wordpress` + `php-fpm` (application layer)
 - `mariadb` (database layer)
 
 The goal is to design a realistic, modular, and persistent web infrastructure where each service runs in its own container, communicates over a dedicated Docker network, and keeps data across restarts via volumes.

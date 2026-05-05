@@ -91,10 +91,10 @@ These named volumes persist data across container recreation.
 ### Host-side data path created by Makefile
 
 The Makefile creates:
-- `/home/<LOGIN>/data/wordpress`
-- `/home/<LOGIN>/data/mariadb`
+- `/home/atursun/data/wordpress`
+- `/home/atursun/data/mariadb`
 
-where `<LOGIN>` is parsed from `srcs/.env`.
+where `atursun` is parsed from `srcs/.env`.
 
 ## 5) Implementation Notes by Service
 
