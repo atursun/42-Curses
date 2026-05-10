@@ -83,8 +83,8 @@ This ensures compose always uses the correct file and env context.
 
 ### Persistent Docker volumes in this project
 
-- `wordpress` -> mounted at `/var/www/html`
-- `mariadb` -> mounted at `/var/lib/mysql`
+- `wordpress` -> mounted at `/home/atursun/data/wordpress`
+- `mariadb` -> mounted at `/home/atursun/data/mariadb`
 
 These named volumes persist data across container recreation.
 
@@ -93,8 +93,6 @@ These named volumes persist data across container recreation.
 The Makefile creates:
 - `/home/atursun/data/wordpress`
 - `/home/atursun/data/mariadb`
-
-where `atursun` is parsed from `srcs/.env`.
 
 ## 5) Implementation Notes by Service
 
